@@ -2,10 +2,20 @@
 
 #include "SORSolver.hpp"
 
+#include <cfenv>
+
 Solvers::SORSolver::SORSolver(FlowField& flowField, const Parameters& parameters):
   LinearSolver(flowField, parameters) {}
 
 void Solvers::SORSolver::solve() {
+
+   #ifndef NDEBUG
+
+  feclearexcept(FE_ALL_EXCEPT & ~FE_INEXACT);
+  if(fetestexcept(FE_ALL_EXCEPT & ~FE_INEXACT))
+    raise(SIGFPE);
+  #endif
+
   RealType resnorm = DBL_MAX, tol = 1e-4;
 
   double omg        = 1.7;
