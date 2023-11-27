@@ -39,7 +39,7 @@ int main(int argc, char* argv[]) {
 #ifndef NDEBUG
   spdlog::warn("Running in Debug mode; make sure to switch to Release mode for production/benchmark runs.");
 
-feenableexcept(FE_ALL_EXCEPT & ~FE_INEXACT); //added after WS1 feedback
+  feenableexcept(FE_ALL_EXCEPT & ~FE_INEXACT); //added after WS1 feedback
 #else
   spdlog::info("Running in Release mode");
 #endif
