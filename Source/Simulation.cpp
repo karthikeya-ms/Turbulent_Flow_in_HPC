@@ -1,11 +1,12 @@
 #include "StdAfx.hpp"
 
 #include "Simulation.hpp"
+#include <cfenv>
 
 #include "Solvers/PetscSolver.hpp"
 #include "Solvers/SORSolver.hpp"
 
-#include <cfenv>
+
 
 Simulation::Simulation(Parameters& parameters, FlowField& flowField):
   parameters_(parameters),
@@ -16,7 +17,8 @@ Simulation::Simulation(Parameters& parameters, FlowField& flowField):
   globalBoundaryFactory_(parameters),
   wallVelocityIterator_(globalBoundaryFactory_.getGlobalBoundaryVelocityIterator(flowField_)),
   wallFGHIterator_(globalBoundaryFactory_.getGlobalBoundaryFGHIterator(flowField_)),
-  fghStencil_(parameters), rhsStencil_(parameters),
+  fghStencil_(parameters), 
+  rhsStencil_(parameters),
   fghIterator_(flowField_, parameters, fghStencil_),
   rhsIterator_(flowField, parameters, rhsStencil_),
   velocityStencil_(parameters),
@@ -35,13 +37,6 @@ Simulation::Simulation(Parameters& parameters, FlowField& flowField):
 
 void Simulation::initializeFlowField() {
 
-  #ifndef NDEBUG
-
-    feclearexcept(FE_ALL_EXCEPT & ~FE_INEXACT);
-    if(fetestexcept(FE_ALL_EXCEPT & ~FE_INEXACT))
-      raise(SIGFPE);
-  
-  #endif
 
 
   if (parameters_.simulation.scenario == "taylor-green") {
@@ -85,12 +80,7 @@ void Simulation::initializeFlowField() {
 
 void Simulation::solveTimestep() {
 
-  #ifndef NDEBUG
 
-  feclearexcept(FE_ALL_EXCEPT & ~FE_INEXACT);
-  if(fetestexcept(FE_ALL_EXCEPT & ~FE_INEXACT))
-    raise(SIGFPE);
-  #endif
 
   // Determine and set max. timestep which is allowed in this simulation
   setTimeStep();
@@ -121,12 +111,6 @@ void Simulation::plotVTK(int timeStep, RealType simulationTime) {
 
 void Simulation::setTimeStep() {
 
-  #ifndef NDEBUG
-
-  feclearexcept(FE_ALL_EXCEPT & ~FE_INEXACT);
-  if(fetestexcept(FE_ALL_EXCEPT & ~FE_INEXACT))
-    raise(SIGFPE);
-  #endif
 
 
   RealType localMin, globalMin;
@@ -138,15 +122,18 @@ void Simulation::setTimeStep() {
   maxUStencil_.reset();
   maxUFieldIterator_.iterate();
   maxUBoundaryIterator_.iterate();
-  RealType u_mini = maxUStencil_.getMaxValues()[0] < 1e-12 ? 1e-12 : maxUStencil_.getMaxValues()[0];
-  RealType v_mini = maxUStencil_.getMaxValues()[1] < 1e-12 ? 1e-12 : maxUStencil_.getMaxValues()[1];
+
+  //RealType u_mini = maxUStencil_.getMaxValues()[0] < 1e-12 ? 1e-12 : maxUStencil_.getMaxValues()[0]; commented after feedback from WS1
+  //RealType v_mini = maxUStencil_.getMaxValues()[1] < 1e-12 ? 1e-12 : maxUStencil_.getMaxValues()[1];
   
   if (parameters_.geometry.dim == 3) {
-    RealType w_mini = maxUStencil_.getMaxValues()[2] < 1e-12 ? 1e-12 : maxUStencil_.getMaxValues()[2];
+    //RealType w_mini = maxUStencil_.getMaxValues()[2] < 1e-12 ? 1e-12 : maxUStencil_.getMaxValues()[2]; commented after feedback from WS1
     factor += 1.0 / (parameters_.meshsize->getDzMin() * parameters_.meshsize->getDzMin());
-    parameters_.timestep.dt = 1.0 / (w_mini);
+    //parameters_.timestep.dt = 1.0 / (w_mini); commented after feedback from WS1
+      parameters_.timestep.dt = 1.0 / (maxUStencil_.getMaxValues()[2] + EPSILON);
   } else {
-    parameters_.timestep.dt = 1.0 / (u_mini);
+    //parameters_.timestep.dt = 1.0 / (u_mini);
+      parameters_.timestep.dt = 1.0 / (maxUStencil_.getMaxValues()[0] + EPSILON);
   }
 
   // localMin = std::min(parameters_.timestep.dt, std::min(std::min(parameters_.flow.Re/(2 * factor), 1.0 /
@@ -155,7 +142,7 @@ void Simulation::setTimeStep() {
   localMin = std::min(
     parameters_.flow.Re / (2 * factor),
     std::min(
-      parameters_.timestep.dt, std::min(1 / (u_mini), 1 / (v_mini))
+      parameters_.timestep.dt, std::min(1 / (maxUStencil_.getMaxValues()[0] + EPSILON), 1 / (maxUStencil_.getMaxValues()[1] +EPSILON))
     )
   );
 
