@@ -4,7 +4,7 @@
     FlowFieldType&                            flowField,
     const Parameters&                         parameters,
     Stencils::BoundaryStencil<FlowFieldType>& stencil,
-    int                                       lowOffset  = 0,
+    int                                       lowOffset  = 0, //concept not clear
     int                                       highOffset = 0
   );
 */
