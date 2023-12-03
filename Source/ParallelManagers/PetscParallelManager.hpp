@@ -1,55 +1,30 @@
-/**
- * Code obtained from iterators.cpph for reference
- * ParallelBoundaryIterator(
-    FlowFieldType&                            flowField,
-    const Parameters&                         parameters,
-    Stencils::BoundaryStencil<FlowFieldType>& stencil,
-    int                                       lowOffset  = 0,
-    int                                       highOffset = 0
-  );
-*/
+#pragma once
 
 #include "Definitions.hpp"
+#include "Iterators.hpp"
 #include "Parameters.hpp"
 #include "Stencils/PressureBufferFillStencil.hpp"
 #include "Stencils/PressureBufferReadStencil.hpp"
 #include "Stencils/VelocityBufferFillStencil.hpp"
 #include "Stencils/VelocityBufferReadStencil.hpp"
-#include "Iterators.hpp"
-#include "FlowField.hpp"
 
 namespace ParallelManagers {
-    class PetscParallelManager{
-    
-    protected: 
 
-        Parameters& parameters_;
-        FlowField& flowfield_;
-        Stencils::VelocityBufferFillStencil fillVelocityStencil;
-        Stencils::VelocityBufferReadStencil readVelocityStencil;
-        Stencils::PressureBufferFillStencil fillPressureStencil;
-        Stencils::PressureBufferReadStencil readPressureStencil;
+/** Class used to manage communication between processes.
+ */
+class PetscParallelManager {
+private:
+  Parameters &parameters_; //! Reference to the parameters
+  FlowField &flowField_;
+  int lowOffset_;
+  int highOffset_;
 
-        ParallelBoundaryIterator<FlowField> velocityfillIterator;
-        ParallelBoundaryIterator<FlowField> velocityreadIterator;
-        ParallelBoundaryIterator<FlowField> pressurefillIterator;
-        ParallelBoundaryIterator<FlowField> pressurereadIterator;
+public:
+  PetscParallelManager(Parameters &parameters, FlowField &flowField,
+                       int lowOffset, int highOffset);
+  ~PetscParallelManager();
+  void communicatePressure();
+  void communicateVelocities();
+};
 
-    public: 
-
-        PetscParallelManager(Parameters& parameters, FlowField& flowfield);
-
-        void communicateVelocity();
-        void communicatePressure();
-
-        virtual ~PetscParallelManager()= default;
-
-
-
-    };
-
-}
-
-
-
-
+} // namespace ParallelManagers
