@@ -1,14 +1,3 @@
-/**
- * Code obtained from iterators.cpph for reference
- * ParallelBoundaryIterator(
-    FlowFieldType&                            flowField,
-    const Parameters&                         parameters,
-    Stencils::BoundaryStencil<FlowFieldType>& stencil,
-    int                                       lowOffset  = 0,
-    int                                       highOffset = 0
-  );
-*/
-
 #include "Definitions.hpp"
 #include "Parameters.hpp"
 #include "Stencils/PressureBufferFillStencil.hpp"
