@@ -17,6 +17,9 @@
 #include "Stencils/VelocityBufferReadStencil.hpp"
 #include "Iterators.hpp"
 #include "FlowField.hpp"
+#include <limits>
+#include <cmath>
+
 
 namespace ParallelManagers {
     class PetscParallelManager{
