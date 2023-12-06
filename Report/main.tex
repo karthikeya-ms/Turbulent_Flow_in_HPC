@@ -50,20 +50,19 @@
   This is a short abstract summarizing the main points of your article.
 \end{abstract}
 
-\section{Parallelization \(30%\)}
+\section{Parallelization (30\%)}
+
 
 We looked at the \texttt{ParallelBoundaryIterator}, which operates on the border of a process domain and operates separately on the top, bottom, left and right faces (in 3D, on the front and back faces too). The stencil used by the iterator needs to have the functions \texttt{applyXWall}, where \texttt{X} is the various sides respectively. We decided to use this iterator and a similar structure for our stencils \texttt{PressureBufferFillStencil}, \texttt{PressureBufferReadStencil}, \texttt{VelocityBufferFillStencil} and \texttt{VelocityBufferReadStencil}.
 
-We then integrated these operations in \texttt{PetscParallelManager}, that uses the methods \texttt{communicatePressure} and \texttt{communicateVelocity} to call \texttt{MPI_Sendrecv}. The calls to this class were added in the classe \texttt{Simulation}.
+We then integrated these operations in \texttt{PetscParallelManager}, that uses the methods \\\texttt{communicatePressure} and \texttt{communicateVelocity} to call \texttt{MPI\_Sendrecv}. The calls to this class were added in the class \texttt{Simulation}.
 
+\section{Scaling and Efficiency (20\%)}
 
+\section{Implementation Turbulence Modeling (30\%)}
 
-\section{Scaling and Efficiency \(20%\)}
+\section{Testing (5\%)}
 
-\section{Implementation Turbulence Modeling \(30%\)}
-
-\section{Testing \(5%\)}
-
-\section{Flow Physics \(15%\)}
+\section{Flow Physics (15\%)}
 
 \end{document}
