@@ -1,0 +1,69 @@
+%%
+% This is an Overleaf template for scientific articles and reports
+% using the TUM Corporate Desing https://www.tum.de/cd
+%
+% For further details on how to use the template, take a look at our
+% GitLab repository and browse through our test documents
+% https://gitlab.lrz.de/latex4ei/tum-templates.
+%
+% The tumarticle class is based on the KOMA-Script class scrartcl.
+% If you need further customization please consult the KOMA-Script guide
+% https://ctan.org/pkg/koma-script.
+% Additional class options are passed down to the base class.
+%
+% If you encounter any bugs or undesired behaviour, please raise an issue
+% in our GitLab repository
+% https://gitlab.lrz.de/latex4ei/tum-templates/issues
+% and provide a description and minimal working example of your problem.
+%%
+
+
+\documentclass[
+  english,        % define the document language (english, german)
+  font=palatino,     % define main text font (helvet, times, palatino, libertine)
+  onecolumn,      % use onecolumn or twocolumn layout
+]{tumarticle}
+
+
+% load additional packages
+\usepackage{lipsum}
+
+
+% article metadata
+\title{Worksheet 2}
+% \subtitle{Subtitle of the article}
+
+\author{Haotian Ji}
+\author{Siva Karthikeya Mandarapu}
+\author{Hari Surya Charan Mudragada}
+\author{Matilde Tozzi}
+
+
+\date{December, 2023}
+
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+  This is a short abstract summarizing the main points of your article.
+\end{abstract}
+
+\section{Parallelization \(30%\)}
+
+We looked at the \texttt{ParallelBoundaryIterator}, which operates on the border of a process domain and operates separately on the top, bottom, left and right faces (in 3D, on the front and back faces too). The stencil used by the iterator needs to have the functions \texttt{applyXWall}, where \texttt{X} is the various sides respectively. We decided to use this iterator and a similar structure for our stencils \texttt{PressureBufferFillStencil}, \texttt{PressureBufferReadStencil}, \texttt{VelocityBufferFillStencil} and \texttt{VelocityBufferReadStencil}.
+
+We then integrated these operations in \texttt{PetscParallelManager}, that uses the methods \texttt{communicatePressure} and \texttt{communicateVelocity} to call \texttt{MPI_Sendrecv}. The calls to this class were added in the classe \texttt{Simulation}.
+
+
+
+\section{Scaling and Efficiency \(20%\)}
+
+\section{Implementation Turbulence Modeling \(30%\)}
+
+\section{Testing \(5%\)}
+
+\section{Flow Physics \(15%\)}
+
+\end{document}

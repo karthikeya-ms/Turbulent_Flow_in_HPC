@@ -69,3 +69,8 @@ dkms.conf
 .vscode
 *.pdf
 Documentation/tectonic
+*.aux
+*.fdb*
+*.fls 
+*.log
+*.synctex*
