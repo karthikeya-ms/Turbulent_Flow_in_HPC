@@ -59,6 +59,55 @@ We then integrated these operations in \texttt{PetscParallelManager}, that uses 
 
 \section{Scaling and Efficiency (20\%)}
 
+For each scenario, we use the following general setup:
+
+\begin{verbatim}
+  <timestep dt="1" tau="0.5" />
+    <solver gamma="0.5" />
+    <geometry dim="3"
+      lengthX="1.0" lengthY="1.0" lengthZ="1.0"
+      sizeX="20" sizeY="10" sizeZ="20"
+    >
+      <mesh>uniform</mesh>
+    </geometry>
+    <environment gx="0" gy="0" gz="0" />
+    <walls>
+        <left>
+            <vector x="0" y="0" z="0" />
+        </left>
+        <right>
+            <vector x="0" y="0" z="0" />
+        </right>
+        <top>
+            <vector x="1" y="0" z="0" />
+        </top>
+        <bottom>
+            <vector x="0" y="0" z="0" />
+        </bottom>
+        <front>
+            <vector x="0" y="0" z="0" />
+        </front>
+        <back>
+            <vector x="0" y="0" z="0" />
+        </back>
+    </walls>
+
+\end{verbatim}
+
+As suggested, we also switched off the VTK output because it is not parallelized.
+
+\subsection{Cavity 3D}
+
+The execution time without \texttt{mpirun} is 34039686ns. This is the situation with different parallel domains:
+
+\begin{tabular}{c c}
+  Parallel Domain & Time       \\
+  1x1x1           & 19178151ns \\
+  2x2x2           & 18492591ns \\
+  3x3x3           & 17050365ns \\
+\end{tabular}
+
+There execution time is lower with a more intensive parallel use, so we don't have a strong parallel scaling in this case.
 \section{Implementation Turbulence Modeling (30\%)}
 
 \section{Testing (5\%)}
