@@ -396,6 +396,13 @@ void Configuration::loadParameters(Parameters& parameters, const MPI_Comm& commu
     //------------------------------------------------------
     // TODO WS2: Turbulence
     //------------------------------------------------------
+    //if (parameters.simulation.type == "turbulence") {
+    parameters.turbMix.k = 0.41;
+    node                 = confFile.FirstChildElement()->FirstChildElement("turbMixing");
+    if (node != NULL) {
+      readFloatMandatory(parameters.turbMix.k, node, "k");
+      // maybe assumptions on del_0.99
+    }
   }
 
   // Broadcasting of the values
