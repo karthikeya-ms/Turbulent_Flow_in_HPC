@@ -1,0 +1,14 @@
+1. Figure out how to compute local viscosity
+According to reference 4, we have exact solution for local viscosity.
+
+2. Why do we have a 1/Re term inside of total viscosity
+It should be the original viscosity, cause velocity and characteristic length are been normlized.
+
+Commute part should be:
+1. Function getVis()
+2. TurbulentFlowField Stencil
+
+3. Function getHeight()
+4. Viscosity Stencil
+
+5. Turbulent parameter keppa = 0.41;
