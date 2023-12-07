@@ -14,7 +14,6 @@ namespace Stencils {
     for (int row = -1; row <= 1; row++) {
       for (int column = -1; column <= 1; column++) {
         localViscosity[39 + 9 * row + 3 * column] = flowField.getTurbVisc().getScalar(i + column, j + row);
-        //TO DO : Need to define a getTurbVisc function inside stencils.
         //Viscosity in each cell is just scalar, we only have one component, so just assigned it to x.
       }
     }
@@ -31,6 +30,55 @@ namespace Stencils {
         }
       }
     }
+  }
+
+//For shear rate tensor calculation (upwind differencing scheme)
+  inline RealType dudy(const RealType* const lv, const RealType* const lm) {
+    const RealType dy_0  = lm[mapd(0, 0, 0, 1)];
+    const RealType dy_M1 = lm[mapd(0, -1, 0, 1)];
+    const RealType dy0   = 0.5 * (dy_0 + dy_M1);
+
+    return (lv[mapd(0, 0, 0, 0)] - lv[mapd(0, -1, 0, 0)]) / dy0;
+  }
+
+  inline RealType dudz(const RealType* const lv, const RealType* const lm) {
+    const RealType dz_0  = lm[mapd(0, 0, 0, 2)];
+    const RealType dz_M1 = lm[mapd(0, 0, -1, 2)];
+    const RealType dz0   = 0.5 * (dz_0 + dz_M1);
+
+    return (lv[mapd(0, 0, 0, 0)] - lv[mapd(0, 0, -1, 0)]) / dz0;
+  }
+
+  inline RealType dvdx(const RealType* const lv, const RealType* const lm) {
+    const RealType dx_0  = lm[mapd(0, 0, 0, 0)];
+    const RealType dx_M1 = lm[mapd(-1, 0, 0, 0)];
+    const RealType dx0   = 0.5 * (dx_0 + dx_M1);
+
+    return (lv[mapd(0, 0, 0, 1)] - lv[mapd(-1, 0, 0, 1)]) / dx0;
+  }
+
+  inline RealType dvdz(const RealType* const lv, const RealType* const lm) {
+    const RealType dz_0  = lm[mapd(0, 0, 0, 2)];
+    const RealType dz_M1 = lm[mapd(0, 0, -1, 2)];
+    const RealType dz0   = 0.5 * (dz_0 + dz_M1);
+
+    return (lv[mapd(0, 0, 0, 1)] - lv[mapd(0, 0, -1, 1)]) / dz0;
+  }
+
+  inline RealType dwdx(const RealType* const lv, const RealType* const lm) {
+    const RealType dx_0  = lm[mapd(0, 0, 0, 0)];
+    const RealType dx_M1 = lm[mapd(-1, 0, 0, 0)];
+    const RealType dx0   = 0.5 * (dx_0 + dx_M1);
+
+    return (lv[mapd(0, 0, 0, 2)] - lv[mapd(-1, 0, 0, 2)]) / dx0;
+  }
+
+  inline RealType dwdy(const RealType* const lv, const RealType* const lm) {
+    const RealType dy_0  = lm[mapd(0, 0, 0, 1)];
+    const RealType dy_M1 = lm[mapd(0, -1, 0, 1)];
+    const RealType dy0   = 0.5 * (dy_0 + dy_M1);
+
+    return (lv[mapd(0, 0, 0, 2)] - lv[mapd(0, -1, 0, 2)]) / dy0;
   }
 
   // Second derivative of turbulent u-component
@@ -191,8 +239,8 @@ inline RealType d2udydx(
                      ) / dz1
                      + 1 / parameters.flow.Re;
 
-    RealType ViscB = (0.5 * (0.5 * (ViscB1 * dx_P1 + ViscB2 * dx_0) / dx1) * dz_0
-                      + 0.5 * (0.5 * (ViscM1 * dx_P1 + ViscM2 * dx_0) / dx1) //* dz_M1
+    RealType ViscB = (0.5 * (0.5 * (ViscB1 * dx_0 + ViscM1 * dx_M1) / dx0) * dz_P1
+                      + 0.5 * (0.5 * (ViscB2 * dx_0 + ViscM2 * dx_M1) / dx0) * dz_0
                      ) / dz1
                      + 1 / parameters.flow.Re;
 
@@ -232,7 +280,7 @@ inline RealType d2vdx2(
                       + 0.5 * (0.5 * (ViscL2 * dx_0 + ViscM2 * dx_M1) / dx0) * dy_0
                      ) / dy1
                      + 1 / parameters.flow.Re;
-
+                     
     return (ViscR * dvdxR - ViscL * dvdxL) / dx_0;
   }
 

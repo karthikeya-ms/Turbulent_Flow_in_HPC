@@ -32,7 +32,7 @@ void Stencils::ComputeLocalViscosityStencil::apply(TurbulentFlowField& flowField
 
     RealType S11 = dudx(localVelocity_, localMeshsize_);
     RealType S22 = dvdy(localVelocity_, localMeshsize_);
-    RealType S12 = 0.5 ;//* (dudy(localVelocity_, localMeshsize_) + dvdx(localVelocity_, localMeshsize_));
+    RealType S12 = 0.5 * (dudy(localVelocity_, localMeshsize_) + dvdx(localVelocity_, localMeshsize_));
 
     RealType SijSij = S11 * S11 + S22 * S22 + 2 * S12 * S12;
 
@@ -60,9 +60,9 @@ void Stencils::ComputeLocalViscosityStencil::apply(TurbulentFlowField& flowField
     RealType S11 = dudx(localVelocity_, localMeshsize_);
     RealType S22 = dvdy(localVelocity_, localMeshsize_);
     RealType S33 = dwdz(localVelocity_, localMeshsize_);
-    RealType S12 = 0.5 ;//* (dudy(localVelocity_, localMeshsize_) + dvdx(localVelocity_, localMeshsize_));
-    RealType S13 = 0.5 ;//* (dudz(localVelocity_, localMeshsize_) + dwdx(localVelocity_, localMeshsize_));
-    RealType S23 = 0.5 ;//* (dvdz(localVelocity_, localMeshsize_) + dwdy(localVelocity_, localMeshsize_));
+    RealType S12 = 0.5 * (dudy(localVelocity_, localMeshsize_) + dvdx(localVelocity_, localMeshsize_));
+    RealType S13 = 0.5 * (dudz(localVelocity_, localMeshsize_) + dwdx(localVelocity_, localMeshsize_));
+    RealType S23 = 0.5 * (dvdz(localVelocity_, localMeshsize_) + dwdy(localVelocity_, localMeshsize_));
 
     RealType SijSij = S11 * S11 + S22 * S22 + S33 * S33 + 2 * S12 * S12 + 2 * S13 * S13 + 2 * S23 * S23;
 
