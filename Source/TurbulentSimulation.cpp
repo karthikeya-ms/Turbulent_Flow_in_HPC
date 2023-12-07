@@ -10,7 +10,13 @@ TurbulentSimulation::TurbulentSimulation(Parameters& parameters, TurbulentFlowFi
   wallhStencil_(parameters),
   wallhIterator_(turbFlowField_, parameters, wallhStencil_),
   turbViscStencil_(parameters),
-  turbViscIterator_(turbFlowField_, parameters, turbViscStencil_)
+  turbViscIterator_(turbFlowField_, parameters, turbViscStencil_),
+  maxTurbViscStencil_(parameters),
+  maxTurbViscIterator_(turbFlowField_, parameters, maxTurbViscStencil_),
+  turbFGHStencil_(parameters),
+  turbFGHIterator_(turbFlowField_, parameters, turbFGHStencil_)
+  
+  // turbWallFGHIterator_(globalBoundaryFactory_.getGlobalBoundaryTurbulentFGHIterator(turbFlowField_))
 {
 }
 
@@ -32,7 +38,7 @@ void TurbulentSimulation::solveTimestep() {
   // Compute local viscosities
   turbViscIterator_.iterate();
   // Compute FGH
-  fghIterator_.iterate();
+  turbFGHIterator_.iterate();
   // Set global boundary values
   wallFGHIterator_.iterate();
   // TODO WS1: compute the right hand side (RHS)
@@ -58,7 +64,7 @@ void TurbulentSimulation::plotVTK(int timeStep, RealType simulationTime) {
 
 void TurbulentSimulation::setTimeStep() {
 
-  RealType localMin, globalMin;
+  RealType localMin, globalMin, maxLocalVisc;
   ASSERTION(parameters_.geometry.dim == 2 || parameters_.geometry.dim == 3);
   RealType factor = 1.0 / (parameters_.meshsize->getDxMin() * parameters_.meshsize->getDxMin())
                     + 1.0 / (parameters_.meshsize->getDyMin() * parameters_.meshsize->getDyMin());
@@ -67,6 +73,10 @@ void TurbulentSimulation::setTimeStep() {
   maxUStencil_.reset();
   maxUFieldIterator_.iterate();
   maxUBoundaryIterator_.iterate();
+
+  // Determine maximum turbVisc
+  maxTurbViscStencil_.reset();
+  maxTurbViscIterator_.iterate();
 
   //RealType u_mini = maxUStencil_.getMaxValues()[0] < 1e-12 ? 1e-12 : maxUStencil_.getMaxValues()[0]; commented after feedback from WS1
   //RealType v_mini = maxUStencil_.getMaxValues()[1] < 1e-12 ? 1e-12 : maxUStencil_.getMaxValues()[1];
@@ -84,8 +94,10 @@ void TurbulentSimulation::setTimeStep() {
   // localMin = std::min(parameters_.timestep.dt, std::min(std::min(parameters_.flow.Re/(2 * factor), 1.0 /
   // maxUStencil_.getMaxValues()[0]), 1.0 / maxUStencil_.getMaxValues()[1]));
 
+  maxLocalVisc = 1.0 / parameters_.flow.Re + maxTurbViscStencil_.getMaxValues();
+
   localMin = std::min(
-    parameters_.flow.Re / (2 * factor),
+     1.0 / (2 * maxLocalVisc * factor),
     std::min(
       parameters_.timestep.dt, std::min(1 / (maxUStencil_.getMaxValues()[0] + EPSILON), 1 / (maxUStencil_.getMaxValues()[1] +EPSILON))
     )

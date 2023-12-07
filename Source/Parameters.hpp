@@ -137,6 +137,7 @@ public:
 class TurbMixingParameters {
 public:
   RealType k = 0.41;
+  int  delta = 2;
 };
 //@}
 

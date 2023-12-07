@@ -46,6 +46,7 @@ void Stencils::WallhStencil::apply(TurbulentFlowField& flowField, int i, int j)
         //         value = value < cornerDist ? value : cornerDist;
         //     }
         // }
+    }
     else { value = 0.0; }
     ASSERTION(value >= 0.0);
 }
@@ -53,7 +54,7 @@ void Stencils::WallhStencil::apply(TurbulentFlowField& flowField, int i, int j)
 void Stencils::WallhStencil::apply(TurbulentFlowField& flowField, int i, int j, int k)
 {
     RealType& value     = flowField.getWallh().getScalar(i, j, k);
-    RealType value2D    = apply(flowField, i, j);
+    RealType& value2D   = flowField.getWallh().getScalar(i, j);
     const int obstacle  = flowField.getFlags().getValue(i, j, k);
     
     const RealType posZ     = parameters_.meshsize->getPosZ(i, j, k) 
