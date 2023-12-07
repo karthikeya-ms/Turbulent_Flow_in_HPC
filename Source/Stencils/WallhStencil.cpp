@@ -64,9 +64,10 @@ void Stencils::WallhStencil::apply(TurbulentFlowField& flowField, int i, int j, 
         const RealType posZ_lastWall = NormalWallDistance(flowField, OBSTACLE_FRONT, i, j, k); 
         const RealType posZ_nextWall = NormalWallDistance(flowField, OBSTACLE_BACK, i, j, k);
 
-        const RealType posZ_nearest = posZ_lastWall < posZ_nextWall ? posZ_lastWall : posZ_nextWall;
+        const RealType distZ_nearest =  (posZ - posZ_lastWall) < (posZ_nextWall - posZ) ? 
+                                        (posZ - posZ_lastWall) : (posZ_nextWall - posZ) ;
 
-        value = value2D < posZ_nearest ? value2D : posZ_nearest;
+        value = value2D < distZ_nearest ? value2D : distZ_nearest;
     }
     else { value = 0.0; }
     ASSERTION(value >= 0.0);
