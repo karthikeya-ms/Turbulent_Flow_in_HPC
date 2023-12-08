@@ -9,6 +9,7 @@
 #include "Definitions.hpp"
 #include "FlowField.hpp"
 #include "Parameters.hpp"
+#include "TurbulentFlowField.hpp"
 
 namespace Stencils {
   /**
@@ -36,7 +37,7 @@ namespace Stencils {
      * @param j index in y
      */
 
-    void applyLeftWall(FlowField& flowField, int i, int j) override;
+    void applyLeftWall(TurbulentFlowField& flowField, int i, int j) override;
     /**
      * @brief Fill values from buffer back into the domains right wall in 2D
      *
@@ -45,7 +46,7 @@ namespace Stencils {
      * @param j index in y
      */
 
-    void applyRightWall(FlowField& flowField, int i, int j) override;
+    void applyRightWall(TurbulentFlowField& flowField, int i, int j) override;
     /**
      * @brief Fill values from buffer back into the domains bottom wall in 2D
      *
@@ -54,7 +55,7 @@ namespace Stencils {
      * @param j index in y
      */
 
-    void applyBottomWall(FlowField& flowField, int i, int j) override;
+    void applyBottomWall(TurbulentFlowField& flowField, int i, int j) override;
     /**
      * @brief Fill values from buffer back into the domains top wall in 2D
      *
@@ -63,7 +64,7 @@ namespace Stencils {
      * @param j index in y
      */
 
-    void applyTopWall(FlowField& flowField, int i, int j) override;
+    void applyTopWall(TurbulentFlowField& flowField, int i, int j) override;
 
     /**
      * @brief Fill values from buffer back into the domains left wall in 3d
@@ -74,7 +75,7 @@ namespace Stencils {
      * @param k index in z
      */
 
-    void applyLeftWall(FlowField& flowField, int i, int j, int k) override;
+    void applyLeftWall(TurbulentFlowField& flowField, int i, int j, int k) override;
     /**
      * @brief Fill values from buffer back into the domains right wall in 3d
      *
@@ -84,7 +85,7 @@ namespace Stencils {
      * @param k index in z
      */
 
-    void applyRightWall(FlowField& flowField, int i, int j, int k) override;
+    void applyRightWall(TurbulentFlowField& flowField, int i, int j, int k) override;
     /**
      * @brief Fill values from buffer back into the domains bottom wall in 3d
      *
@@ -94,7 +95,7 @@ namespace Stencils {
      * @param k index in z
      */
 
-    void applyBottomWall(FlowField& flowField, int i, int j, int k) override;
+    void applyBottomWall(TurbulentFlowField& flowField, int i, int j, int k) override;
     /**
      * @brief Fill values from buffer back into the domains top wall in 3d
      *
@@ -104,7 +105,7 @@ namespace Stencils {
      * @param k index in z
      */
 
-    void applyTopWall(FlowField& flowField, int i, int j, int k) override;
+    void applyTopWall(TurbulentFlowField& flowField, int i, int j, int k) override;
     /**
      * @brief Fill values from buffer back into the domains front wall in 3d
      *
@@ -114,7 +115,7 @@ namespace Stencils {
      * @param k index in z
      */
 
-    void applyFrontWall(FlowField& flowField, int i, int j, int k) override;
+    void applyFrontWall(TurbulentFlowField& flowField, int i, int j, int k) override;
     /**
      * @brief Fill values from buffer back into the domains back wall in 3d
      *
@@ -124,7 +125,7 @@ namespace Stencils {
      * @param k index in z
      */
 
-    void applyBackWall(FlowField& flowField, int i, int j, int k) override;
+    void applyBackWall(TurbulentFlowField& flowField, int i, int j, int k) override;
     /**
      * @brief pointer to the readbuffer to the left wall
      *

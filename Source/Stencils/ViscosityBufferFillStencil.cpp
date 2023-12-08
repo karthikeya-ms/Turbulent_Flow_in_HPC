@@ -30,70 +30,70 @@ Stencils::ViscosityBufferFillStencil::ViscosityBufferFillStencil(const Parameter
   }
 }
 // For 2D Cases
-void Stencils::ViscosityBufferFillStencil::applyLeftWall(FlowField& flowField, int i, int j) {
+void Stencils::ViscosityBufferFillStencil::applyLeftWall(TurbulentFlowField& flowField, int i, int j) {
   if (j >= 2 && j <= (localSize[1] + 1)) {
-    *(leftViscosityFillBuffer.get() + (j - 2)) = (flowField.getTurbulentViscosity().getScalar(i + 2, j));
+    *(leftViscosityFillBuffer.get() + (j - 2)) = (flowField.getTurbVisc().getScalar(i + 2, j));
   }
 }
 
-void Stencils::ViscosityBufferFillStencil::applyRightWall(FlowField& flowField, int i, int j) {
+void Stencils::ViscosityBufferFillStencil::applyRightWall(TurbulentFlowField& flowField, int i, int j) {
   if (j >= 2 && j <= (localSize[1] + 1)) {
     // Need to verify indices
-    *(rightViscosityFillBuffer.get() + (j - 2)) = (flowField.getTurbulentViscosity().getScalar(i - 1, j));
+    *(rightViscosityFillBuffer.get() + (j - 2)) = (flowField.getTurbVisc().getScalar(i - 1, j));
   }
 }
 
-void Stencils::ViscosityBufferFillStencil::applyBottomWall(FlowField& flowField, int i, int j) {
+void Stencils::ViscosityBufferFillStencil::applyBottomWall(TurbulentFlowField& flowField, int i, int j) {
   if ((i >= 2 && i <= localSize[0] + 1)) {
-    *(bottomViscosityFillBuffer.get() + (i - 2)) = (flowField.getTurbulentViscosity().getScalar(i, j + 2));
+    *(bottomViscosityFillBuffer.get() + (i - 2)) = (flowField.getTurbVisc().getScalar(i, j + 2));
   }
 }
 
-void Stencils::ViscosityBufferFillStencil::applyTopWall(FlowField& flowField, int i, int j) {
+void Stencils::ViscosityBufferFillStencil::applyTopWall(TurbulentFlowField& flowField, int i, int j) {
   if ((i >= 2 && i <= localSize[0] + 1)) {
-    *(topViscosityFillBuffer.get() + (i - 2)) = (flowField.getTurbulentViscosity().getScalar(i, j - 1));
+    *(topViscosityFillBuffer.get() + (i - 2)) = (flowField.getTurbVisc().getScalar(i, j - 1));
   }
 }
 
 // For 3D Cases
-void Stencils::ViscosityBufferFillStencil::applyLeftWall(FlowField& flowField, int i, int j, int k) {
+void Stencils::ViscosityBufferFillStencil::applyLeftWall(TurbulentFlowField& flowField, int i, int j, int k) {
   if ((j >= 2) && (k >= 2) && j <= (localSize[1] + 1) && k <= (localSize[2] + 1)) {
-    *(leftViscosityFillBuffer.get() + (j - 2) + (k - 2) * localSize[1]) = (flowField.getTurbulentViscosity().getScalar(i + 2, j, k)
+    *(leftViscosityFillBuffer.get() + (j - 2) + (k - 2) * localSize[1]) = (flowField.getTurbVisc().getScalar(i + 2, j, k)
     );
   }
 }
 
-void Stencils::ViscosityBufferFillStencil::applyRightWall(FlowField& flowField, int i, int j, int k) {
+void Stencils::ViscosityBufferFillStencil::applyRightWall(TurbulentFlowField& flowField, int i, int j, int k) {
   if ((j >= 2) && (k >= 2) && j <= (localSize[1] + 1) && k <= (localSize[2] + 1)) {
     *(rightViscosityFillBuffer.get() + (j - 2) + (k - 2) * localSize[1]
-    ) = (flowField.getTurbulentViscosity().getScalar(i - 1, j, k));
+    ) = (flowField.getTurbVisc().getScalar(i - 1, j, k));
   }
 }
 
-void Stencils::ViscosityBufferFillStencil::applyBottomWall(FlowField& flowField, int i, int j, int k) {
+void Stencils::ViscosityBufferFillStencil::applyBottomWall(TurbulentFlowField& flowField, int i, int j, int k) {
   if ((i >= 2) && (k >= 2) && i <= (localSize[0] + 1) && k <= (localSize[2] + 1)) {
     *(bottomViscosityFillBuffer.get() + (i - 2) * localSize[2] + (k - 2)
-    ) = (flowField.getTurbulentViscosity().getScalar(i, j + 2, k));
+    ) = (flowField.getTurbVisc().getScalar(i, j + 2, k));
   }
 }
 
-void Stencils::ViscosityBufferFillStencil::applyTopWall(FlowField& flowField, int i, int j, int k) {
+void Stencils::ViscosityBufferFillStencil::applyTopWall(TurbulentFlowField& flowField, int i, int j, int k) {
   if ((i >= 2) && (k >= 2) && i <= (localSize[0] + 1) && k <= (localSize[2] + 1)) {
-    *(topViscosityFillBuffer.get() + (i - 2) * localSize[2] + (k - 2)) = (flowField.getTurbulentViscosity().getScalar(i, j - 1, k)
+    *(topViscosityFillBuffer.get() + (i - 2) * localSize[2] + (k - 2)) = (flowField.getTurbVisc().getScalar(i, j - 1, k)
     );
   }
 }
 
-void Stencils::ViscosityBufferFillStencil::applyFrontWall(FlowField& flowField, int i, int j, int k) {
+void Stencils::ViscosityBufferFillStencil::applyFrontWall(TurbulentFlowField& flowField, int i, int j, int k) {
   if ((i >= 2) && (j >= 2) && i <= (localSize[0] + 1) && j <= (localSize[1] + 1)) {
     *(frontViscosityFillBuffer.get() + (i - 2) * localSize[1] + (j - 2)
-    ) = (flowField.getTurbulentViscosity().getScalar(i, j, k + 2));
+    ) = (flowField.getTurbVisc().getScalar(i, j, k + 2));
   }
 }
 
-void Stencils::ViscosityBufferFillStencil::applyBackWall(FlowField& flowField, int i, int j, int k) {
+void Stencils::ViscosityBufferFillStencil::applyBackWall(TurbulentFlowField& flowField, int i, int j, int k) {
   if ((i >= 2) && (j >= 2) && i <= (localSize[0] + 1) && j <= (localSize[1] + 1)) {
-    *(backViscosityFillBuffer.get() + (i - 2) * localSize[1] + (j - 2)) = (flowField.getTurbulentViscosity().getScalar(i, j, k - 1)
+    *(backViscosityFillBuffer.get() + (i - 2) * localSize[1] + (j - 2)) = (flowField.getTurbVisc().getScalar(i, j, k - 1)
     );
   }
 }
