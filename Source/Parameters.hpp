@@ -136,6 +136,13 @@ public:
 };
 //@}
 
+class TurbMixingParameters {
+public:
+  RealType k = 0.41;
+  int  delta = 2;
+};
+//@}
+
 /** A class to store and pass around the parameters
  */
 class Parameters {
@@ -154,7 +161,7 @@ public:
   ParallelParameters      parallel;
   StdOutParameters        stdOut;
   BFStepParameters        bfStep;
-
+  TurbMixingParameters    turbMix;
 
   // TODO WS2: include parameters for turbulence
   Meshsize* meshsize;

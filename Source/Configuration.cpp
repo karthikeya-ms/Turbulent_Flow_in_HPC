@@ -396,6 +396,19 @@ void Configuration::loadParameters(Parameters& parameters, const MPI_Comm& commu
     //------------------------------------------------------
     // TODO WS2: Turbulence
     //------------------------------------------------------
+    if (parameters.simulation.type == "turbulence") {
+      parameters.turbMix.k      = 0.41;
+      parameters.turbMix.delta  = 2;
+      node                 = confFile.FirstChildElement()->FirstChildElement("turbMixing");
+      if (node != NULL) {
+        readFloatMandatory(parameters.turbMix.k, node, "k");
+        readIntMandatory(parameters.turbMix.delta, node, "delta");
+        // maybe assumptions on del_0.99
+      }
+      else {
+        throw std::runtime_error("Error loading turbulence parameters");
+      }
+    }
   }
 
   // Broadcasting of the values
@@ -436,6 +449,9 @@ void Configuration::loadParameters(Parameters& parameters, const MPI_Comm& commu
 
   MPI_Bcast(&(parameters.bfStep.xRatio), 1, MY_MPI_FLOAT, 0, communicator);
   MPI_Bcast(&(parameters.bfStep.yRatio), 1, MY_MPI_FLOAT, 0, communicator);
+  
+  MPI_Bcast(&(parameters.turbMix.k), 1, MY_MPI_FLOAT, 0, communicator);
+  MPI_Bcast(&(parameters.turbMix.delta), 1, MPI_INT, 0, communicator);
 
   MPI_Bcast(parameters.parallel.numProcessors, 3, MPI_INT, 0, communicator);
 

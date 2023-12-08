@@ -727,5 +727,4 @@ namespace Stencils {
             - dw2dz(localVelocity, parameters, localMeshsize) - duwdx(localVelocity, parameters, localMeshsize)
             - dvwdy(localVelocity, parameters, localMeshsize) + parameters.environment.gz);
   }
-
 } // namespace Stencils
