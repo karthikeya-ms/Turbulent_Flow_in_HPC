@@ -40,4 +40,6 @@ public:
 
   /** Plots the flow field */
   void plotVTK(int timeStep, RealType simulationTime);
+
+  ParallelManagers::PetscTurbulentParallelManager parallel_manager_;
 };

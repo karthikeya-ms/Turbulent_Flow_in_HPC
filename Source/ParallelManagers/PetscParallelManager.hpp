@@ -1,9 +1,12 @@
 #include "Definitions.hpp"
 #include "Parameters.hpp"
+#include "TurbulentFlowField.hpp"
 #include "Stencils/PressureBufferFillStencil.hpp"
 #include "Stencils/PressureBufferReadStencil.hpp"
 #include "Stencils/VelocityBufferFillStencil.hpp"
 #include "Stencils/VelocityBufferReadStencil.hpp"
+#include "Stencils/ViscosityBufferFillStencil.hpp"
+#include "Stencils/ViscosityBufferReadStencil.hpp"
 #include "Iterators.hpp"
 #include "FlowField.hpp"
 #include <limits>
@@ -39,5 +42,28 @@ namespace ParallelManagers {
 
 
     };
+
+    class PetscTurbulentParallelManager: public PetscParallelManager {
+    
+    private:
+        
+        TurbulentFlowField& flowfield_;
+        
+        Stencils::ViscosityBufferFillStencil fillViscosityStencil;
+        
+        Stencils::ViscosityBufferReadStencil readViscosityStencil;
+        
+        ParallelBoundaryIterator<TurbulentFlowField> viscosityfillIterator;
+        
+        ParallelBoundaryIterator<TurbulentFlowField> viscosityreadIterator;
+
+    public:
+        
+        PetscTurbulentParallelManager(Parameters& parameters, TurbulentFlowField& flowfield);
+        
+        void communicateViscosity();
+        
+        virtual ~PetscTurbulentParallelManager() = default;
+  };
 
 }

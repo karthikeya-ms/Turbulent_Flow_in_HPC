@@ -14,7 +14,8 @@ TurbulentSimulation::TurbulentSimulation(Parameters& parameters, TurbulentFlowFi
   maxTurbViscStencil_(parameters),
   maxTurbViscIterator_(turbFlowField_, parameters, maxTurbViscStencil_),
   turbFGHStencil_(parameters),
-  turbFGHIterator_(turbFlowField_, parameters, turbFGHStencil_)
+  turbFGHIterator_(turbFlowField_, parameters, turbFGHStencil_),
+  parallel_manager_(parameters, flowField)
   
   // turbWallFGHIterator_(globalBoundaryFactory_.getGlobalBoundaryTurbulentFGHIterator(turbFlowField_))
 {
@@ -34,6 +35,7 @@ void TurbulentSimulation::solveTimestep() {
   // Such protected members can be directly accessed in the child class.
 
   // Determine and set max. timestep which is allowed in this simulation
+  parallel_manager_.communicateVelocity();
   setTimeStep();
   // Compute local viscosities
   turbViscIterator_.iterate();
@@ -45,10 +47,12 @@ void TurbulentSimulation::solveTimestep() {
   rhsIterator_.iterate();
   // Solve for pressure
   solver_->solve();
+  parallel_manager_.communicatePressure();
   // TODO WS2: communicate pressure values
   // Compute velocity
   velocityIterator_.iterate();
   obstacleIterator_.iterate();
+   parallel_manager_.communicateVelocity();
   // TODO WS2: communicate velocity values
   // Iterate for velocities on the boundary
   wallVelocityIterator_.iterate();
