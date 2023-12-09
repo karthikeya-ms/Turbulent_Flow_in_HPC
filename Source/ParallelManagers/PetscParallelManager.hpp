@@ -1,69 +1,155 @@
+#pragma once
+
 #include "Definitions.hpp"
 #include "Parameters.hpp"
 #include "TurbulentFlowField.hpp"
+
+#include "FlowField.hpp"
+#include "Iterators.hpp"
 #include "Stencils/PressureBufferFillStencil.hpp"
 #include "Stencils/PressureBufferReadStencil.hpp"
 #include "Stencils/VelocityBufferFillStencil.hpp"
 #include "Stencils/VelocityBufferReadStencil.hpp"
 #include "Stencils/ViscosityBufferFillStencil.hpp"
 #include "Stencils/ViscosityBufferReadStencil.hpp"
-#include "Iterators.hpp"
-#include "FlowField.hpp"
-#include <limits>
-#include <cmath>
-
 
 namespace ParallelManagers {
-    class PetscParallelManager{
-    
-    protected: 
+  class PetscParallelManager {
+    /**
+     * @brief PetscParallelManager class to define all communication related attributes and methods for MPI
+     * parallelisation
+     *
+     */
 
-        Parameters& parameters_;
-        FlowField& flowfield_;
-        Stencils::VelocityBufferFillStencil fillVelocityStencil;
-        Stencils::VelocityBufferReadStencil readVelocityStencil;
-        Stencils::PressureBufferFillStencil fillPressureStencil;
-        Stencils::PressureBufferReadStencil readPressureStencil;
+  protected:
+    /**
+     * @brief parameters for flow
+     *
+     */
+    Parameters& parameters_;
+    /**
+     * @brief Flowfield for all the flow quantities
+     *
+     */
+    FlowField& flowfield_;
 
-        ParallelBoundaryIterator<FlowField> velocityfillIterator;
-        ParallelBoundaryIterator<FlowField> velocityreadIterator;
-        ParallelBoundaryIterator<FlowField> pressurefillIterator;
-        ParallelBoundaryIterator<FlowField> pressurereadIterator;
+    /**
+     * @brief Stencil which fills the velocities during communication
+     *
+     */
 
-    public: 
+    Stencils::VelocityBufferFillStencil fillVelocityStencil;
+    /**
+     * @brief Stencil which reads the velocities during communication
+     *
+     */
+    Stencils::VelocityBufferReadStencil readVelocityStencil;
+    /**
+     * @brief Stencil which fills the pressures during communication
+     *
+     */
+    Stencils::PressureBufferFillStencil fillPressureStencil;
+    /**
+     * @brief Stencil which reads the pressures during communication
+     *
+     */
+    Stencils::PressureBufferReadStencil readPressureStencil;
+    /**
+     * @brief Iterator which operates on the velocityFillStencil
+     *
+     */
+    ParallelBoundaryIterator<FlowField> velocityfillIterator;
+    /**
+     * @brief Iterator which operates on the velocityReadStencil
+     *
+     */
+    ParallelBoundaryIterator<FlowField> velocityreadIterator;
+    /**
+     * @brief Iterator which operates on the pressureReadStencil
+     *
+     */
+    ParallelBoundaryIterator<FlowField> pressurereadIterator;
+    /**
+     * @brief Iteratore which operates on the pressureFillStencil
+     *
+     */
+    ParallelBoundaryIterator<FlowField> pressurefillIterator;
 
-        PetscParallelManager(Parameters& parameters, FlowField& flowfield);
-
-        void communicateVelocity();
-        void communicatePressure();
-
-        virtual ~PetscParallelManager()= default;
-
-
-
-    };
-
-    class PetscTurbulentParallelManager: public PetscParallelManager {
-    
-    private:
-        
-        TurbulentFlowField& flowfield_;
-        
-        Stencils::ViscosityBufferFillStencil fillViscosityStencil;
-        
-        Stencils::ViscosityBufferReadStencil readViscosityStencil;
-        
-        ParallelBoundaryIterator<TurbulentFlowField> viscosityfillIterator;
-        
-        ParallelBoundaryIterator<TurbulentFlowField> viscosityreadIterator;
-
-    public:
-        
-        PetscTurbulentParallelManager(Parameters& parameters, TurbulentFlowField& flowfield);
-        
-        void communicateViscosity();
-        
-        virtual ~PetscTurbulentParallelManager() = default;
+  public:
+    /**
+     * @brief Construct a new Petsc Parallel Manager object
+     *
+     * @param parameters parameters of the flow simulation
+     * @param flowfield flowfield to store the flow quantities
+     */
+    PetscParallelManager(Parameters& parameters, FlowField& flowfield);
+    /**
+     * @brief method which communicates velocities using MPI
+     *
+     */
+    void communicateVelocity();
+    /**
+     * @brief method which communicates pressures using MPI
+     *
+     */
+    void communicatePressure();
+    /**
+     * @brief Destroy the Petsc Parallel Manager object
+     *
+     */
+    virtual ~PetscParallelManager() = default;
   };
 
-}
+  class PetscTurbulentParallelManager: public PetscParallelManager {
+    /**
+     * @brief ParallelManger inherited from the default one to handle turbulent scenarios
+     *
+     */
+  private:
+    /**
+     * @brief Turbulent flowField which holds flow quantities
+     *
+     */
+    TurbulentFlowField& flowfield_;
+    /**
+     * @brief Stencil which fills the viscosities during communication
+     *
+     */
+    Stencils::ViscosityBufferFillStencil fillViscosityStencil;
+    /**
+     * @brief Stencil which reads the viscosities during communication
+     *
+     */
+    Stencils::ViscosityBufferReadStencil readViscosityStencil;
+    /**
+     * @brief Iterator which operates on viscosityFillStencil
+     *
+     */
+    ParallelBoundaryIterator<TurbulentFlowField> viscosityfillIterator;
+    /**
+     * @brief Iterator which operates on viscosityReadStencil
+     *
+     */
+    ParallelBoundaryIterator<TurbulentFlowField> viscosityreadIterator;
+
+  public:
+    /**
+     * @brief Construct a new Petsc Turbulent Parallel Manager object
+     *
+     * @param parameters parameters of the flow simulation
+     * @param flowfield Turbulent Flow field to hold the flow quantities
+     */
+    PetscTurbulentParallelManager(Parameters& parameters, TurbulentFlowField& flowfield);
+    /**
+     * @brief Method to communicate viscosity in a parallel simulation using MPI
+     *
+     */
+    void communicateViscosity();
+    /**
+     * @brief Destroy the Petsc Turbulent Parallel Manager object
+     *
+     */
+    virtual ~PetscTurbulentParallelManager() = default;
+  };
+
+} // namespace ParallelManagers
