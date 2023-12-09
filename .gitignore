@@ -74,5 +74,6 @@ Documentation/tectonic
 *.fls 
 *.log
 *.synctex*
+.nfs*
 
 !Report/main.pdf
