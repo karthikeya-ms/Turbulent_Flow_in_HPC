@@ -138,8 +138,22 @@ It is quite clear here, especially considering the behaviour of the 4x4x1 domain
   4x4x1           & 8021217360ns \\
 \end{tabular}
 
-If we consider the 3D Channel with a 100x50x100 spatial domain and 4x3x4 parallel domain we get 32397910983ns against 107381417991ns of sequential time, that is, 3.3 times faster. This is clearly still not a strong scaling, because we are using 48 processors. 
-   
+If we consider the 3D Channel with a 100x50x100 spatial domain and 4x3x4 parallel domain we get 32397910983ns against 107381417991ns of sequential time, that is, 3.3 times faster. This is clearly still not a strong scaling, because we are using 48 processors.
+\\
+
+So far, we only considered \textit{strong scaling}. In the case of \textit{weak scaling} instead, we use the test case that we still haven't considered, that is \texttt{ChannelBackwardFacingStep}.
+\\
+
+2D:
+
+\begin{tabular}{c r}
+  Sequential  & 445603490ns   \\
+  4 processes & 6599985417ns  \\
+  9 processes & 18636742914ns \\
+\end{tabular}
+\\
+
+
 
 
 
@@ -260,6 +274,204 @@ If we consider the 3D Channel with a 100x50x100 spatial domain and 4x3x4 paralle
     </walls>
     <vtk interval="0.01">Cavity3D</vtk>
     <stdOut interval="0.01" />
+    <parallel numProcessorsX="1" numProcessorsY="1" numProcessorsZ="1" />
+</configuration>
+
+\end{verbatim}
+
+\subsubsection*{Channel2D}
+
+\begin{verbatim}
+  <?xml version="1.0" encoding="utf-8"?>
+<configuration>
+    <flow Re="100" />
+    <simulation finalTime="10.0" >
+        <type>dns</type>
+        <scenario>channel</scenario>
+    </simulation>
+    <timestep dt="1" tau="0.5" />
+    <solver gamma="0.5" />
+    <geometry
+      dim="2"
+      lengthX="5.0" lengthY="1.0" lengthZ="1.0"
+      sizeX="10" sizeY="20" sizeZ="10"
+      stretchX="false" stretchY="true" stretchZ="true"
+    >
+      <mesh>uniform</mesh>
+      <!--mesh>stretched</mesh-->
+    </geometry>
+    <environment gx="0" gy="0" gz="0" />
+    <walls>
+        <left>
+            <vector x="1.0" y="0" z="0" />
+        </left>
+        <right>
+            <vector x="0" y="0" z="0" />
+        </right>
+        <top>
+            <vector x="0.0" y="0." z="0." />
+        </top>
+        <bottom>
+            <vector x="0" y="0" z="0" />
+        </bottom>
+        <front>
+            <vector x="0" y="0" z="0" />
+        </front>
+        <back>
+            <vector x="0" y="0" z="0" />
+        </back>
+    </walls>
+    <vtk interval="0.1">Channel2D</vtk>
+    <stdOut interval="0.0001" />
+    <parallel numProcessorsX="1" numProcessorsY="1" numProcessorsZ="1" />
+</configuration>
+
+\end{verbatim}
+
+\subsubsection*{Channel3D}
+
+\begin{verbatim}
+  <?xml version="1.0" encoding="utf-8"?>
+<configuration>
+    <flow Re="100" />
+    <simulation finalTime="10.0" >
+        <type>dns</type>
+        <scenario>channel</scenario>
+    </simulation>
+    <timestep dt="1" tau="0.5" />
+    <solver gamma="0.5" />
+    <geometry
+      dim="3"
+      lengthX="5.0" lengthY="1.0" lengthZ="1.0"
+      sizeX="10" sizeY="20" sizeZ="10"
+      stretchX="false" stretchY="true" stretchZ="true"
+    >
+      <mesh>uniform</mesh>
+      <!--mesh>stretched</mesh-->
+    </geometry>
+    <environment gx="0" gy="0" gz="0" />
+    <walls>
+        <left>
+            <vector x="1.0" y="0" z="0" />
+        </left>
+        <right>
+            <vector x="0" y="0" z="0" />
+        </right>
+        <top>
+            <vector x="0.0" y="0." z="0." />
+        </top>
+        <bottom>
+            <vector x="0" y="0" z="0" />
+        </bottom>
+        <front>
+            <vector x="0" y="0" z="0" />
+        </front>
+        <back>
+            <vector x="0" y="0" z="0" />
+        </back>
+    </walls>
+    <vtk interval="0.1">Channel3D</vtk>
+    <stdOut interval="0.0001" />
+    <parallel numProcessorsX="1" numProcessorsY="1" numProcessorsZ="1" />
+</configuration>
+
+\end{verbatim}
+
+\subsubsection*{ChannelBackwardFacingStep2D}
+
+\begin{verbatim}
+  <?xml version="1.0" encoding="utf-8"?>
+<configuration>
+    <flow Re="100" />
+    <simulation finalTime="10.0" >
+        <type>dns</type>
+        <scenario>channel</scenario>
+    </simulation>
+    <backwardFacingStep xRatio="0.2" yRatio="0.2" />
+    <timestep dt="1" tau="0.5" />
+    <solver gamma="0.5" />
+    <geometry
+      dim="2"
+      lengthX="5.0" lengthY="1.0" lengthZ="1.0"
+      sizeX="20" sizeY="40" sizeZ="20"
+      stretchX="false" stretchY="true" stretchZ="true"
+    >
+      <mesh>uniform</mesh>
+      <!--mesh>stretched</mesh-->
+    </geometry>
+    <environment gx="0" gy="0" gz="0" />
+    <walls>
+        <left>
+            <vector x="1.0" y="0" z="0" />
+        </left>
+        <right>
+            <vector x="0" y="0" z="0" />
+        </right>
+        <top>
+            <vector x="0.0" y="0." z="0." />
+        </top>
+        <bottom>
+            <vector x="0" y="0" z="0" />
+        </bottom>
+        <front>
+            <vector x="0" y="0" z="0" />
+        </front>
+        <back>
+            <vector x="0" y="0" z="0" />
+        </back>
+    </walls>
+    <vtk interval="0.1">ChannelBackwardFacingStep2D</vtk>
+    <stdOut interval="0.0001" />
+    <parallel numProcessorsX="1" numProcessorsY="1" numProcessorsZ="1" />
+</configuration>
+
+\end{verbatim}
+
+\subsubsection*{ChannelBackwardFacingStep3D}
+
+\begin{verbatim}
+  <?xml version="1.0" encoding="utf-8"?>
+<configuration>
+    <flow Re="100" />
+    <simulation finalTime="10.0" >
+        <type>dns</type>
+        <scenario>channel</scenario>
+    </simulation>
+    <backwardFacingStep xRatio="0.2" yRatio="0.2" />
+    <timestep dt="1" tau="0.5" />
+    <solver gamma="0.5" />
+    <geometry
+      dim="3"
+      lengthX="5.0" lengthY="1.0" lengthZ="1.0"
+      sizeX="20" sizeY="40" sizeZ="20"
+      stretchX="false" stretchY="true" stretchZ="true"
+    >
+      <mesh>uniform</mesh>
+      <!--mesh>stretched</mesh-->
+    </geometry>
+    <environment gx="0" gy="0" gz="0" />
+    <walls>
+        <left>
+            <vector x="1.0" y="0" z="0" />
+        </left>
+        <right>
+            <vector x="0" y="0" z="0" />
+        </right>
+        <top>
+            <vector x="0.0" y="0." z="0." />
+        </top>
+        <bottom>
+            <vector x="0" y="0" z="0" />
+        </bottom>
+        <front>
+            <vector x="0" y="0" z="0" />
+        </front>
+        <back>
+            <vector x="0" y="0" z="0" />
+        </back>
+    </walls>
+    <vtk interval="0.1">ChannelBackwardFacingStep3D</vtk>
+    <stdOut interval="0.0001" />
     <parallel numProcessorsX="1" numProcessorsY="1" numProcessorsZ="1" />
 </configuration>
 
