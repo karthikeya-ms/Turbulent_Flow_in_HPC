@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <configuration>
-    <flow Re="5000" />
+    <flow Re="100" />
     <simulation finalTime="10.0" >
-        <type>turbulence</type>
+        <type>dns</type>
         <scenario>channel</scenario>
     </simulation>
-    <turbMixing k="0.41" delta="2"/>
     <timestep dt="1" tau="0.5" />
     <solver gamma="0.5" />
     <geometry

@@ -37,9 +37,9 @@ protected:
   GlobalBoundaryIterator<FlowField> wallFGHIterator_;
   
   Stencils::FGHStencil     fghStencil_;
+  Stencils::RHSStencil rhsStencil_;
   FieldIterator<FlowField> fghIterator_;
   FieldIterator<FlowField> rhsIterator_;
-  Stencils::RHSStencil rhsStencil_;
 
   Stencils::VelocityStencil velocityStencil_;
   Stencils::ObstacleStencil obstacleStencil_;

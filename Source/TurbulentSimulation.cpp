@@ -2,13 +2,6 @@
 
 #include "TurbulentSimulation.hpp"
 
-#include "FlowField.hpp"
-#include "Simulation.hpp"
-#include "TurbulentFlowField.hpp"
-
-#include "Stencils/MaxTurbViscStencil.hpp"
-#include "Stencils/TurbulentVTKStencil.hpp"
-
 
 TurbulentSimulation::TurbulentSimulation(Parameters& parameters, TurbulentFlowField& flowField):
   Simulation::Simulation(parameters, flowField),

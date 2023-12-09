@@ -15,13 +15,13 @@ void Stencils::ComputeLocalViscosityStencil::apply(TurbulentFlowField& flowField
     } 
     else if (parameters_.turbMix.delta == 1) { //Case for laminar flat plate
         auto x = parameters_.meshsize->getPosX(i, j) + 0.5 * parameters_.meshsize->getDx(i, j);
-        delta  = 4.91 * x / (sqrt(parameters_.walls.vectorLeft[0] * x * parameters_.flow.Re)+EPSILON);
+        delta  = 4.91 * x / sqrt(parameters_.walls.vectorLeft[0] * x * parameters_.flow.Re);
         //reynolds number here stand for reciprocal of viscosity
         // cause velocity and characteristic length are normalised.
     } 
     else if (parameters_.turbMix.delta == 2) {//Case for turbulent flat plate
         auto x = parameters_.meshsize->getPosX(i, j) + 0.5 * parameters_.meshsize->getDx(i, j);
-        delta  = 0.382 * x / (pow(parameters_.walls.vectorLeft[0] * x * parameters_.flow.Re, 0.2) + EPSILON);
+        delta  = 0.382 * x / pow(parameters_.walls.vectorLeft[0] * x * parameters_.flow.Re, 0.2);
     }
 
     //Calculate mixing length by Prandtl's model
@@ -46,11 +46,11 @@ void Stencils::ComputeLocalViscosityStencil::apply(TurbulentFlowField& flowField
     } 
     else if (parameters_.turbMix.delta == 1) {
         auto x = parameters_.meshsize->getPosX(i, j) + 0.5 * parameters_.meshsize->getDx(i, j);
-        delta  = 4.91 * x / (sqrt(parameters_.walls.vectorLeft[0] * x * parameters_.flow.Re) + EPSILON);
+        delta  = 4.91 * x / sqrt(parameters_.walls.vectorLeft[0] * x * parameters_.flow.Re);
     } 
     else if (parameters_.turbMix.delta == 2){
         auto x = parameters_.meshsize->getPosX(i, j) + 0.5 * parameters_.meshsize->getDx(i, j);
-        delta  = 0.382 * x / (pow(parameters_.walls.vectorLeft[0] * x * parameters_.flow.Re, 0.2) + EPSILON);
+        delta  = 0.382 * x / pow(parameters_.walls.vectorLeft[0] * x * parameters_.flow.Re, 0.2);
     }
     RealType lm = std::min(parameters_.turbMix.k * flowField.getWallh().getScalar(i, j, k), 0.09 * delta);
 
