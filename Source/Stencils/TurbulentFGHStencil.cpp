@@ -33,15 +33,15 @@ void Stencils::TurbulentFGHStencil::apply(TurbulentFlowField& flowField, int i, 
 
     if ((obstacle & OBSTACLE_RIGHT) == 0) { // If the right cell is fluid
       values[0] = computeTurbulentF3D
-      (localVelocity_, localMeshsize_, localViscosity_, parameters_, parameters_.timestep.dt);
+      (localVelocity_, localViscosity_, localMeshsize_,  parameters_, parameters_.timestep.dt);
     }
     if ((obstacle & OBSTACLE_TOP) == 0) {
       values[1] = computeTurbulentG3D
-      (localVelocity_, localMeshsize_, localViscosity_, parameters_, parameters_.timestep.dt);
+      (localVelocity_, localViscosity_, localMeshsize_,  parameters_, parameters_.timestep.dt);
     }
     if ((obstacle & OBSTACLE_BACK) == 0) {
       values[2] = computeTurbulentH3D
-      (localVelocity_, localMeshsize_, localViscosity_, parameters_, parameters_.timestep.dt);
+      (localVelocity_, localViscosity_, localMeshsize_,  parameters_, parameters_.timestep.dt);
     }
   }
 }

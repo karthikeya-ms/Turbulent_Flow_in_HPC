@@ -2,9 +2,10 @@
 <configuration>
     <flow Re="100" />
     <simulation finalTime="10.0" >
-        <type>dns</type>
+        <type>turbulence</type>
         <scenario>channel</scenario>
     </simulation>
+    <turbMixing k="0.41" delta="2"/>
     <timestep dt="1" tau="0.5" />
     <solver gamma="0.5" />
     <geometry
