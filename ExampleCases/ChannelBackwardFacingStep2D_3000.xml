@@ -2,7 +2,7 @@
 <configuration>
     <flow Re="3000" />
     <simulation finalTime="10.0" >
-        <type>dns</type>
+        <type>turbulence</type>
         <scenario>channel</scenario>
     </simulation>
     <turbMixing k="0.41" delta="2"/>
