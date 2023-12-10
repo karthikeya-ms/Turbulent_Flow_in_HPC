@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <configuration>
-    <flow Re="100" />
+    <flow Re="6000" />
     <simulation finalTime="10.0" >
         <type>turbulence</type>
         <scenario>channel</scenario>
