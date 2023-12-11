@@ -17,8 +17,6 @@ namespace Stencils {
 
     void apply(TurbulentFlowField& flowField, int i, int j) override;
     void apply(TurbulentFlowField& flowField, int i, int j, int k) override;
-
-    RealType NormalWallDistance(TurbulentFlowField& flowField, int OBSTACLE_DIR, int i, int j, int k=0);
   };
 
 } // namespace Stencils

@@ -10,11 +10,6 @@ void Stencils::WallhStencil::apply(TurbulentFlowField& flowField, int i, int j)
     RealType& value     = flowField.getWallh().getScalar(i, j);
     const int obstacle  = flowField.getFlags().getValue(i, j);
 
-    const RealType posX     = parameters_.meshsize->getPosX(i, j) 
-                            + 0.5*parameters_.meshsize->getDx(i, j);    
-    const RealType posY     = parameters_.meshsize->getPosY(i, j) 
-                            + 0.5*parameters_.meshsize->getDy(i, j); 
-
     // parameters_.meshsize->getPosX(i,j,k) exists
     // MeshSize.hpp::UniformMesh::getPosX - Line 66
     // Stencils::TurbulentVTKStencil::writePoints - Line 64
@@ -22,30 +17,29 @@ void Stencils::WallhStencil::apply(TurbulentFlowField& flowField, int i, int j)
     // BoundaryType.hpp - enum for obstacle
 
     if ((obstacle & OBSTACLE_SELF) == 0) {    // If this is a fluid cell  
-        const RealType posX_lastWall = NormalWallDistance(flowField, OBSTACLE_LEFT, i, j);      // -ve dir
-        const RealType posX_nextWall = NormalWallDistance(flowField, OBSTACLE_RIGHT, i, j);     // +ve dir
-        const RealType posY_lastWall = NormalWallDistance(flowField, OBSTACLE_BOTTOM, i, j);    // -ve dir
-        const RealType posY_nextWall = NormalWallDistance(flowField, OBSTACLE_TOP, i, j);       // +ve dir
-        
-        // Take the difference and check, otherwise only Pos*_lastWall will be taken 
-        const RealType distX_nearest =  (posX - posX_lastWall) < (posX_nextWall - posX) ? 
-                                        (posX - posX_lastWall) : (posX_nextWall - posX) ;
-        const RealType distY_nearest =  (posY - posY_lastWall) < (posY_nextWall - posY) ? 
-                                        (posY - posY_lastWall) : (posY_nextWall - posY) ;
+        const RealType posX     = parameters_.meshsize->getPosX(i, j) + 0.5*parameters_.meshsize->getDx(i, j);    
+        const RealType posY     = parameters_.meshsize->getPosY(i, j) + 0.5*parameters_.meshsize->getDy(i, j); 
+        const RealType wallX    = parameters_.geometry.lengthX;
+        const RealType wallY    = parameters_.geometry.lengthY;
+
+        RealType distX_nearest = (posX) < (wallX - posX) ? (posX) : (wallX - posX) ;
+        RealType distY_nearest = (posY) < (wallY - posY) ? (posY) : (wallY - posX) ;
+
+        if (parameters_.simulation.scenario == "pressure-channel"){
+            const RealType xLimit = parameters_.bfStep.xRatio * parameters_.geometry.lengthX;
+            const RealType yLimit = parameters_.bfStep.yRatio * parameters_.geometry.lengthY;
+
+            if ((xLimit < posX) && (yLimit > posY)){
+                distX_nearest =  distX_nearest < (xLimit - posX) ? distX_nearest : (xLimit - posX) ;
+            }
+            if ((xLimit > posX) && (yLimit < posY)){
+                distY_nearest =  distY_nearest < (yLimit - posY) ? distY_nearest : (yLimit - posY) ;
+            }
+        }
 
         // Only checking normal wall distance even in BFStep case, 
         // even if the pythagorean distance to the corner can be the smallest one.
         value = distX_nearest < distY_nearest ? distX_nearest : distY_nearest ;
-
-        // if (parameters_.simulation.scenario == "pressure-channel"){
-        //     const RealType xLimit = parameters.bfStep.xRatio * parameters.geometry.lengthX;
-        //     const RealType yLimit = parameters.bfStep.yRatio * parameters.geometry.lengthY;
-
-        //     if ((xLimit < posX) && (yLimit < posY)){
-        //         RealType cornerDist = sqrt((xLimit-posX)*(xLimit-posX) + (yLimit-posY)*(yLimit-posY));
-        //         value = value < cornerDist ? value : cornerDist;
-        //     }
-        // }
     }
     else { value = 0.0; }
     ASSERTION(value >= 0.0);
@@ -54,65 +48,18 @@ void Stencils::WallhStencil::apply(TurbulentFlowField& flowField, int i, int j)
 void Stencils::WallhStencil::apply(TurbulentFlowField& flowField, int i, int j, int k)
 {
     RealType& value     = flowField.getWallh().getScalar(i, j, k);
-    RealType& value2D   = flowField.getWallh().getScalar(i, j);
     const int obstacle  = flowField.getFlags().getValue(i, j, k);
     
-    const RealType posZ     = parameters_.meshsize->getPosZ(i, j, k) 
-                            + 0.5*parameters_.meshsize->getDz(i, j, k);
+    if ((obstacle & OBSTACLE_SELF) == 0) {    // If this is a fluid cell
+        const RealType& value2D = flowField.getWallh().getScalar(i, j);
 
-    if ((obstacle & OBSTACLE_SELF) == 0) {    // If this is a fluid cell  
-        const RealType posZ_lastWall = NormalWallDistance(flowField, OBSTACLE_FRONT, i, j, k); 
-        const RealType posZ_nextWall = NormalWallDistance(flowField, OBSTACLE_BACK, i, j, k);
+        const RealType posZ     = parameters_.meshsize->getPosZ(i, j, k) + 0.5*parameters_.meshsize->getDz(i, j, k);
+        const RealType wallZ    = parameters_.geometry.lengthZ;
 
-        const RealType distZ_nearest =  (posZ - posZ_lastWall) < (posZ_nextWall - posZ) ? 
-                                        (posZ - posZ_lastWall) : (posZ_nextWall - posZ) ;
+        RealType distZ_nearest  = (posZ) < (wallZ - posZ) ? (posZ) : (wallZ - posZ) ;
 
         value = value2D < distZ_nearest ? value2D : distZ_nearest;
     }
     else { value = 0.0; }
     ASSERTION(value >= 0.0);
-}
-
-RealType Stencils::WallhStencil::NormalWallDistance(TurbulentFlowField& flowField, int OBSTACLE_DIR, int i, int j, int k){
-    int iter_obstacle   = flowField.getFlags().getValue(i, j, k);
-    int iter_i          = i;
-    int iter_j          = j;
-    int iter_k          = k;
-    RealType result     = 0.0;
-        
-    while((iter_obstacle & OBSTACLE_DIR) != 0){
-        if      ((OBSTACLE_DIR &  OBSTACLE_LEFT)==0)    { iter_i -= 1; }
-        else if ((OBSTACLE_DIR &  OBSTACLE_RIGHT)==0)   { iter_i += 1; }
-        else if ((OBSTACLE_DIR &  OBSTACLE_BOTTOM)==0)  { iter_j -= 1; }
-        else if ((OBSTACLE_DIR &  OBSTACLE_TOP)==0)     { iter_j += 1; }
-        else if ((OBSTACLE_DIR &  OBSTACLE_FRONT)==0)   { iter_k -= 1; }
-        else if ((OBSTACLE_DIR &  OBSTACLE_BACK)==0)    { iter_k += 1; }
-        else {}
-        iter_obstacle = flowField.getFlags().getValue(iter_i, iter_j, iter_k);
-    }
-
-    if ((OBSTACLE_DIR &  OBSTACLE_LEFT)==0){
-        result  = parameters_.meshsize->getPosX(iter_i, iter_j, iter_k);
-    }
-    else if ((OBSTACLE_DIR &  OBSTACLE_RIGHT)==0){
-        iter_i += 1;
-        result  = parameters_.meshsize->getPosX(iter_i, iter_j, iter_k);
-    }
-    else if ((OBSTACLE_DIR &  OBSTACLE_BOTTOM)==0){
-        result  = parameters_.meshsize->getPosY(iter_i, iter_j, iter_k);
-    }
-    else if ((OBSTACLE_DIR &  OBSTACLE_TOP)==0){
-        iter_j += 1;
-        result  = parameters_.meshsize->getPosY(iter_i, iter_j, iter_k);
-    }
-    else if ((OBSTACLE_DIR &  OBSTACLE_FRONT)==0){
-        result  = parameters_.meshsize->getPosZ(iter_i, iter_j, iter_k);
-    }
-    else if ((OBSTACLE_DIR &  OBSTACLE_BACK)==0){
-        iter_k += 1;
-        result  = parameters_.meshsize->getPosZ(iter_i, iter_j, iter_k);
-    }
-    else {}
-
-    return result;
 }
