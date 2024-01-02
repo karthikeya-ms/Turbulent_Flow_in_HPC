@@ -15,6 +15,12 @@ TurbulentSimulation::TurbulentSimulation(Parameters& parameters, TurbulentFlowFi
   maxTurbViscIterator_(turbFlowField_, parameters, maxTurbViscStencil_),
   turbFGHStencil_(parameters),
   turbFGHIterator_(turbFlowField_, parameters, turbFGHStencil_),
+  ChViscosityStencil_(parameters),
+  ChViscosityIterator_(turbFlowField_, parameters, ChViscosityStencil_),
+  QStencil_(parameters),
+  QIterator_(turbFlowField_, parameters, QStencil_),
+  LaplaceStencil_(parameters),
+  LaplaceIterator_(turbFlowField_, parameters, LaplaceStencil_),
   parallel_manager_(parameters, flowField)
   
   // turbWallFGHIterator_(globalBoundaryFactory_.getGlobalBoundaryTurbulentFGHIterator(turbFlowField_))
@@ -37,6 +43,12 @@ void TurbulentSimulation::solveTimestep() {
   // Determine and set max. timestep which is allowed in this simulation
   parallel_manager_.communicateVelocity();
   setTimeStep();
+  //Compute source terms in Spalart-Allmaras model
+  QIterator_.iterate();
+  //Compute laplace terms in Spalart-Allmaras model
+  LaplaceIterator_.iterate();
+  //Compute characteristic viscosity
+  ChViscosityIterator_.iterate();
   // Compute local viscosities
   turbViscIterator_.iterate();
   // Compute FGH

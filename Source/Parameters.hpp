@@ -143,6 +143,25 @@ public:
 };
 //@}
 
+class TurbSAParameters {
+public:
+  RealType k = 0.41;
+
+  RealType cb1 = 0.1355;
+  RealType cb2 = 0.6220;
+  RealType cb3 = 0.6667; //represent 2/3
+
+  RealType cv1 = 7.1;
+
+  RealType cw1 = 3.2391; //represent (cb1 / pow(k, 2)) + ((1 + cb2) / cb3)
+  RealType cw2 = 0.3;
+  RealType cw3 = 2.0;
+
+  RealType ct3 = 1.2;
+  RealType ct4 = 0.5;
+};
+//Parameters used in Spalart–Allmaras turbulence model
+
 /** A class to store and pass around the parameters
  */
 class Parameters {
@@ -162,7 +181,7 @@ public:
   StdOutParameters        stdOut;
   BFStepParameters        bfStep;
   TurbMixingParameters    turbMix;
+  TurbSAParameters        turbSA;
 
-  // TODO WS2: include parameters for turbulence
   Meshsize* meshsize;
 };
