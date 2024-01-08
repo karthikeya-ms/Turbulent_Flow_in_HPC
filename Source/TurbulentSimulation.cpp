@@ -19,8 +19,8 @@ TurbulentSimulation::TurbulentSimulation(Parameters& parameters, TurbulentFlowFi
   ChViscosityIterator_(turbFlowField_, parameters, ChViscosityStencil_),
   QStencil_(parameters),
   QIterator_(turbFlowField_, parameters, QStencil_),
-  LaplaceStencil_(parameters),
-  LaplaceIterator_(turbFlowField_, parameters, LaplaceStencil_),
+  NablaStencil_(parameters),
+  NablaIterator_(turbFlowField_, parameters, NablaStencil_),
   parallel_manager_(parameters, flowField)
   
   // turbWallFGHIterator_(globalBoundaryFactory_.getGlobalBoundaryTurbulentFGHIterator(turbFlowField_))
@@ -45,8 +45,8 @@ void TurbulentSimulation::solveTimestep() {
   setTimeStep();
   //Compute source terms in Spalart-Allmaras model
   QIterator_.iterate();
-  //Compute laplace terms in Spalart-Allmaras model
-  LaplaceIterator_.iterate();
+  //Compute Nabla terms in Spalart-Allmaras model
+  NablaIterator_.iterate();
   //Compute characteristic viscosity
   ChViscosityIterator_.iterate();
   // Compute local viscosities

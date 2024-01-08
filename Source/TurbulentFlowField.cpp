@@ -7,7 +7,7 @@ TurbulentFlowField::TurbulentFlowField(int Nx, int Ny):
   turb_visc_(ScalarField(Nx + 3, Ny + 3)),
   wall_h_(ScalarField(Nx + 3, Ny + 3)),
   Q_(ScalarField(Nx + 3, Ny + 3)),
-  Laplace_(ScalarField(Nx + 3, Ny + 3)),
+  Nabla_(ScalarField(Nx + 3, Ny + 3)),
   ChVis_(ScalarField(Nx + 3, Ny + 3)) {
 
   ASSERTION(Nx > 0);
@@ -19,7 +19,7 @@ TurbulentFlowField::TurbulentFlowField(int Nx, int Ny, int Nz):
   turb_visc_(ScalarField(Nx + 3, Ny + 3, Nz + 3)),
   wall_h_(ScalarField(Nx + 3, Ny + 3, Nz + 3)),
   Q_(ScalarField(Nx + 3, Ny + 3, Nz + 3)),
-  Laplace_(ScalarField(Nx + 3, Ny + 3, Nz + 3)),
+  Nabla_(ScalarField(Nx + 3, Ny + 3, Nz + 3)),
   ChVis_(ScalarField(Nx + 3, Ny + 3, Nz + 3)) {
   
   ASSERTION(Nx > 0);
@@ -44,7 +44,7 @@ TurbulentFlowField::TurbulentFlowField(const Parameters& parameters):
     ScalarField(parameters.parallel.localSize[0] + 3, parameters.parallel.localSize[1] + 3) : 
     ScalarField(parameters.parallel.localSize[0] + 3, parameters.parallel.localSize[1] + 3, parameters.parallel.localSize[2] + 3)
   ),
-  Laplace_(
+  Nabla_(
     parameters.geometry.dim == 2 ? 
     ScalarField(parameters.parallel.localSize[0] + 3, parameters.parallel.localSize[1] + 3) : 
     ScalarField(parameters.parallel.localSize[0] + 3, parameters.parallel.localSize[1] + 3, parameters.parallel.localSize[2] + 3)
@@ -62,7 +62,7 @@ ScalarField& TurbulentFlowField::getWallh() { return wall_h_; }
 
 ScalarField& TurbulentFlowField::getQ() { return Q_; }
 
-ScalarField& TurbulentFlowField::getLaplace() { return Laplace_; }
+ScalarField& TurbulentFlowField::getNabla() { return Nabla_; }
 
 ScalarField& TurbulentFlowField::getChVis() { return ChVis_; }
 

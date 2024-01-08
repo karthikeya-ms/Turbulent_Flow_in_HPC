@@ -14,7 +14,7 @@
 
 #include "Stencils/ChViscosityStencil.hpp" // Spalart-Allmaras turbulence model stencils
 #include "Stencils/QStencil.hpp"
-#include "Stencils/LaplaceStencil.hpp"
+#include "Stencils/NablaStencil.hpp"
 
 class TurbulentSimulation : public Simulation {
 protected:
@@ -33,8 +33,8 @@ protected:
   FieldIterator<TurbulentFlowField>       ChViscosityIterator_;
   Stencils::QStencil                      QStencil_;
   FieldIterator<TurbulentFlowField>       QIterator_;
-  Stencils::LaplaceStencil                LaplaceStencil_;
-  FieldIterator<TurbulentFlowField>       LaplaceIterator_;
+  Stencils::NablaStencil                  NablaStencil_;
+  FieldIterator<TurbulentFlowField>       NablaIterator_;
 
   // Set up the boundary conditions
   // GlobalBoundaryIterator<TurbulentFlowField>  turbWallFGHIterator_;

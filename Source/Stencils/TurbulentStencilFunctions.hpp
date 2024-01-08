@@ -224,12 +224,12 @@ inline RealType d2udydx(
     const RealType dx0   = 0.5 * (dx_0 + dx_M1);
     const RealType dx1   = 0.5 * (dx_0 + dx_P1);
 
-    RealType ViscT1 = lvis[mapd(0, 0, 1, 0)];
+    RealType ViscT1 = lvis[mapd(1, 0, 0, 0)];
     RealType ViscT2 = lvis[mapd(1, 0, 1, 0)];
     RealType ViscM1 = lvis[mapd(0, 0, 0, 0)];
-    RealType ViscM2 = lvis[mapd(1, 0, 0, 0)];
-    RealType ViscB1 = lvis[mapd(0, 0, -1, 0)];
-    RealType ViscB2 = lvis[mapd(1, 0, -1, 0)];
+    RealType ViscM2 = lvis[mapd(0, 0, 1, 0)];
+    RealType ViscB1 = lvis[mapd(-1, 0, 0, 0)];
+    RealType ViscB2 = lvis[mapd(-1, 0, 1, 0)];
 
     RealType dudzT = (lv[mapd(0, 0, 1, 0)] - lv[mapd(0, 0, 0, 0)]) / dz1;
     RealType dudzB = (lv[mapd(-1, 0, 1, 0)] - lv[mapd(-1, 0, 0, 0)]) / dz1;
@@ -550,11 +550,11 @@ inline RealType d2wdydz(
     RealType dwdyB = lv[mapd(0, 1, -1, 2)] - lv[mapd(0, 0, -1, 2)] / dy1;
 
     RealType ViscT1 = lvis[mapd(0, 0, 1, 0)];
-    RealType ViscT2 = lvis[mapd(1, 0, 1, 0)];
+    RealType ViscT2 = lvis[mapd(0, 1, 1, 0)];
     RealType ViscM1 = lvis[mapd(0, 0, 0, 0)];
-    RealType ViscM2 = lvis[mapd(1, 0, 0, 0)];
+    RealType ViscM2 = lvis[mapd(0, 1, 0, 0)];
     RealType ViscB1 = lvis[mapd(0, 0, -1, 0)];
-    RealType ViscB2 = lvis[mapd(1, 0, -1, 0)];
+    RealType ViscB2 = lvis[mapd(0, 1, -1, 0)];
 
     RealType ViscT = (0.5 * (0.5 * (ViscT1 * dy_P1 + ViscT2 * dy_0) / dy1) * dz_0
                       + 0.5 * (0.5 * (ViscM1 * dy_P1 + ViscM2 * dy_0) / dy1) * dz_P1

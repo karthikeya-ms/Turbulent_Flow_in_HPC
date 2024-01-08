@@ -6,8 +6,7 @@
 
 namespace Stencils {
 
-  /** Stencil to compute the characteristic viscosity once the source term Q and Laplace term has been calculated.
-   */
+  /*Stencil to compute the characteristic viscosity once the source term Q and Nabla term has been calculated.*/
   class ChViscosityStencil: public FieldStencil<TurbulentFlowField> {
   public:
     ChViscosityStencil(const Parameters& parameters);

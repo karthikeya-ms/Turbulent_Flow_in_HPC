@@ -13,6 +13,7 @@ namespace Stencils {
     RealType localVelocity_[27 * 3];
     RealType localMeshsize_[27 * 3];
 
+    //Load coefficients for source term of spalart allmaras turbulence model
     RealType cb1 = parameters_.turbSA.cb1;
     RealType ct3 = parameters_.turbSA.ct3;
     RealType ct4 = parameters_.turbSA.ct4;
