@@ -17,6 +17,7 @@ namespace Stencils {
 
     void apply(TurbulentFlowField& flowField, int i, int j) override;
     void apply(TurbulentFlowField& flowField, int i, int j, int k) override;
+    RealType get2Dwallh(int i, int j);
   };
 
 } // namespace Stencils

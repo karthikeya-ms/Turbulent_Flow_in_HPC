@@ -8,16 +8,16 @@ TurbulentSimulation::TurbulentSimulation(Parameters& parameters, TurbulentFlowFi
   turbFlowField_(flowField),
   // and stencils / iterators using turbFlowField (WS2)
   wallhStencil_(parameters),
-  wallhIterator_(turbFlowField_, parameters, wallhStencil_),
+  wallhIterator_(turbFlowField_, parameters, wallhStencil_, 1, 0), // Thanks to Field Iterator Implementation
   turbViscStencil_(parameters),
-  turbViscIterator_(turbFlowField_, parameters, turbViscStencil_),
+  turbViscIterator_(turbFlowField_, parameters, turbViscStencil_, 1, 0), // keeping in mind the FGH implementation
+  // not .., 0, 1) as we use turbVisc at i,j,k==2 for i,j,k==1 implicitly in
+  // implementation because did not understand how to use globalBoundaryIterator
   maxTurbViscStencil_(parameters),
-  maxTurbViscIterator_(turbFlowField_, parameters, maxTurbViscStencil_),
+  maxTurbViscIterator_(turbFlowField_, parameters, maxTurbViscStencil_, 1, 0), // Thanks to Field Iterator Implementation
   turbFGHStencil_(parameters),
   turbFGHIterator_(turbFlowField_, parameters, turbFGHStencil_),
   parallel_manager_(parameters, flowField)
-  
-  // turbWallFGHIterator_(globalBoundaryFactory_.getGlobalBoundaryTurbulentFGHIterator(turbFlowField_))
 {
 }
 
@@ -25,6 +25,8 @@ void TurbulentSimulation::initializeFlowField() {
 
   Simulation::initializeFlowField(); // Same init as Simulation
   wallhIterator_.iterate(); // Calculation needed only once, hence here.
+  spdlog::info("delta: {}", parameters_.turbMix.delta);
+  spdlog::info("scenario: {}",parameters_.simulation.scenario);
 }
 
 void TurbulentSimulation::solveTimestep() {

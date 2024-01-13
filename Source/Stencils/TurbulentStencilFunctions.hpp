@@ -34,51 +34,117 @@ namespace Stencils {
 
 //For shear rate tensor calculation (upwind differencing scheme)
   inline RealType dudy(const RealType* const lv, const RealType* const lm) {
-    const RealType dy_0  = lm[mapd(0, 0, 0, 1)];
-    const RealType dy_M1 = lm[mapd(0, -1, 0, 1)];
-    const RealType dy0   = 0.5 * (dy_0 + dy_M1);
+    // const RealType dy_0  = lm[mapd(0, 0, 0, 1)];
+    // const RealType dy_M1 = lm[mapd(0, -1, 0, 1)];
+    // const RealType dy0   = 0.5 * (dy_0 + dy_M1);
 
-    return (lv[mapd(0, 0, 0, 0)] - lv[mapd(0, -1, 0, 0)]) / dy0;
+    // return (lv[mapd(0, 0, 0, 0)] - lv[mapd(0, -1, 0, 0)]) / dy0;
+    const RealType dy_M1 = lm[mapd(0,-1, 0, 1)];
+    const RealType dy_0  = lm[mapd(0, 0, 0, 1)];
+    const RealType dy_P1 = lm[mapd(0, 1, 0, 1)];
+    const RealType dy0   = 0.5 * (dy_0 + dy_M1);//Average mesh size for streched mesh 
+    const RealType dy1   = 0.5 * (dy_0 + dy_P1);//Average mesh size for streched mesh
+
+    const RealType u_B  = 0.5 * (lv[mapd(0,-1, 0, 0)] + lv[mapd(-1,-1, 0, 0)]);
+    const RealType u_M  = 0.5 * (lv[mapd(0, 0, 0, 0)] + lv[mapd(-1, 0, 0, 0)]);
+    const RealType u_T  = 0.5 * (lv[mapd(0, 1, 0, 0)] + lv[mapd(-1, 1, 0, 0)]);
+
+    return 0.5 * ((u_T - u_M)/dy1 + (u_M - u_B)/dy0);
   }
 
   inline RealType dudz(const RealType* const lv, const RealType* const lm) {
-    const RealType dz_0  = lm[mapd(0, 0, 0, 2)];
-    const RealType dz_M1 = lm[mapd(0, 0, -1, 2)];
-    const RealType dz0   = 0.5 * (dz_0 + dz_M1);
+    // const RealType dz_0  = lm[mapd(0, 0, 0, 2)];
+    // const RealType dz_M1 = lm[mapd(0, 0, -1, 2)];
+    // const RealType dz0   = 0.5 * (dz_0 + dz_M1);
 
-    return (lv[mapd(0, 0, 0, 0)] - lv[mapd(0, 0, -1, 0)]) / dz0;
+    // return (lv[mapd(0, 0, 0, 0)] - lv[mapd(0, 0, -1, 0)]) / dz0;
+    const RealType dz_M1 = lm[mapd(0, 0,-1, 2)];
+    const RealType dz_0  = lm[mapd(0, 0, 0, 2)];
+    const RealType dz_P1 = lm[mapd(0, 0, 1, 2)];
+    const RealType dz0   = 0.5 * (dz_0 + dz_M1);//Average mesh size for streched mesh 
+    const RealType dz1   = 0.5 * (dz_0 + dz_P1);//Average mesh size for streched mesh
+
+    const RealType u_B  = 0.5 * (lv[mapd(0, 0,-1, 0)] + lv[mapd(-1, 0,-1, 0)]);
+    const RealType u_M  = 0.5 * (lv[mapd(0, 0, 0, 0)] + lv[mapd(-1, 0, 0, 0)]);
+    const RealType u_T  = 0.5 * (lv[mapd(0, 0, 1, 0)] + lv[mapd(-1, 0, 1, 0)]);
+
+    return 0.5 * ((u_T - u_M)/dz1 + (u_M - u_B)/dz0);
   }
 
   inline RealType dvdx(const RealType* const lv, const RealType* const lm) {
-    const RealType dx_0  = lm[mapd(0, 0, 0, 0)];
-    const RealType dx_M1 = lm[mapd(-1, 0, 0, 0)];
-    const RealType dx0   = 0.5 * (dx_0 + dx_M1);
+    // const RealType dx_0  = lm[mapd(0, 0, 0, 0)];
+    // const RealType dx_M1 = lm[mapd(-1, 0, 0, 0)];
+    // const RealType dx0   = 0.5 * (dx_0 + dx_M1);
 
-    return (lv[mapd(0, 0, 0, 1)] - lv[mapd(-1, 0, 0, 1)]) / dx0;
+    // return (lv[mapd(0, 0, 0, 1)] - lv[mapd(-1, 0, 0, 1)]) / dx0;
+    const RealType dx_M1 = lm[mapd(-1, 0, 0, 0)];
+    const RealType dx_0  = lm[mapd( 0, 0, 0, 0)];
+    const RealType dx_P1 = lm[mapd( 1, 0, 0, 0)];
+    const RealType dx0   = 0.5 * (dx_0 + dx_M1);//Average mesh size for streched mesh 
+    const RealType dx1   = 0.5 * (dx_0 + dx_P1);//Average mesh size for streched mesh
+
+    const RealType v_L  = 0.5 * (lv[mapd(-1, 0, 0, 1)] + lv[mapd(-1, -1, 0, 1)]);
+    const RealType v_M  = 0.5 * (lv[mapd( 0, 0, 0, 1)] + lv[mapd( 0, -1, 0, 1)]);
+    const RealType v_R  = 0.5 * (lv[mapd( 1, 0, 0, 1)] + lv[mapd( 1, -1, 0, 1)]);
+
+    return 0.5 * ((v_R - v_M)/dx1 + (v_M - v_L)/dx0);
   }
 
   inline RealType dvdz(const RealType* const lv, const RealType* const lm) {
-    const RealType dz_0  = lm[mapd(0, 0, 0, 2)];
-    const RealType dz_M1 = lm[mapd(0, 0, -1, 2)];
-    const RealType dz0   = 0.5 * (dz_0 + dz_M1);
+    // const RealType dz_0  = lm[mapd(0, 0, 0, 2)];
+    // const RealType dz_M1 = lm[mapd(0, 0, -1, 2)];
+    // const RealType dz0   = 0.5 * (dz_0 + dz_M1);
 
-    return (lv[mapd(0, 0, 0, 1)] - lv[mapd(0, 0, -1, 1)]) / dz0;
+    // return (lv[mapd(0, 0, 0, 1)] - lv[mapd(0, 0, -1, 1)]) / dz0;
+    const RealType dz_M1 = lm[mapd(0, 0,-1, 2)];
+    const RealType dz_0  = lm[mapd(0, 0, 0, 2)];
+    const RealType dz_P1 = lm[mapd(0, 0, 1, 2)];
+    const RealType dz0   = 0.5 * (dz_0 + dz_M1);//Average mesh size for streched mesh 
+    const RealType dz1   = 0.5 * (dz_0 + dz_P1);//Average mesh size for streched mesh
+
+    const RealType v_L  = 0.5 * (lv[mapd(0, 0,-1, 1)] + lv[mapd(0, -1,-1, 1)]);
+    const RealType v_M  = 0.5 * (lv[mapd(0, 0, 0, 1)] + lv[mapd(0, -1, 0, 1)]);
+    const RealType v_R  = 0.5 * (lv[mapd(0, 0, 1, 1)] + lv[mapd(0, -1, 1, 1)]);
+
+    return 0.5 * ((v_R - v_M)/dz1 + (v_M - v_L)/dz0);
   }
 
   inline RealType dwdx(const RealType* const lv, const RealType* const lm) {
-    const RealType dx_0  = lm[mapd(0, 0, 0, 0)];
-    const RealType dx_M1 = lm[mapd(-1, 0, 0, 0)];
-    const RealType dx0   = 0.5 * (dx_0 + dx_M1);
+    // const RealType dx_0  = lm[mapd(0, 0, 0, 0)];
+    // const RealType dx_M1 = lm[mapd(-1, 0, 0, 0)];
+    // const RealType dx0   = 0.5 * (dx_0 + dx_M1);
 
-    return (lv[mapd(0, 0, 0, 2)] - lv[mapd(-1, 0, 0, 2)]) / dx0;
+    // return (lv[mapd(0, 0, 0, 2)] - lv[mapd(-1, 0, 0, 2)]) / dx0;
+    const RealType dx_M1 = lm[mapd(-1, 0, 0, 0)];
+    const RealType dx_0  = lm[mapd( 0, 0, 0, 0)];
+    const RealType dx_P1 = lm[mapd( 1, 0, 0, 0)];
+    const RealType dx0   = 0.5 * (dx_0 + dx_M1);//Average mesh size for streched mesh 
+    const RealType dx1   = 0.5 * (dx_0 + dx_P1);//Average mesh size for streched mesh
+
+    const RealType w_L  = 0.5 * (lv[mapd(-1, 0, 0, 2)] + lv[mapd(-1, 0, -1, 2)]);
+    const RealType w_M  = 0.5 * (lv[mapd( 0, 0, 0, 2)] + lv[mapd( 0, 0, -1, 2)]);
+    const RealType w_R  = 0.5 * (lv[mapd( 1, 0, 0, 2)] + lv[mapd( 1, 0, -1, 2)]);
+
+    return 0.5 * ((w_R - w_M)/dx1 + (w_M - w_L)/dx0);
   }
 
   inline RealType dwdy(const RealType* const lv, const RealType* const lm) {
-    const RealType dy_0  = lm[mapd(0, 0, 0, 1)];
-    const RealType dy_M1 = lm[mapd(0, -1, 0, 1)];
-    const RealType dy0   = 0.5 * (dy_0 + dy_M1);
+    // const RealType dy_0  = lm[mapd(0, 0, 0, 1)];
+    // const RealType dy_M1 = lm[mapd(0, -1, 0, 1)];
+    // const RealType dy0   = 0.5 * (dy_0 + dy_M1);
 
-    return (lv[mapd(0, 0, 0, 2)] - lv[mapd(0, -1, 0, 2)]) / dy0;
+    // return (lv[mapd(0, 0, 0, 2)] - lv[mapd(0, -1, 0, 2)]) / dy0;
+    const RealType dy_M1 = lm[mapd(0,-1, 0, 1)];
+    const RealType dy_0  = lm[mapd(0, 0, 0, 1)];
+    const RealType dy_P1 = lm[mapd(0, 1, 0, 1)];
+    const RealType dy0   = 0.5 * (dy_0 + dy_M1);//Average mesh size for streched mesh 
+    const RealType dy1   = 0.5 * (dy_0 + dy_P1);//Average mesh size for streched mesh
+
+    const RealType w_L  = 0.5 * (lv[mapd(0,-1, 0, 2)] + lv[mapd(0,-1, -1, 2)]);
+    const RealType w_M  = 0.5 * (lv[mapd(0, 0, 0, 2)] + lv[mapd(0, 0, -1, 2)]);
+    const RealType w_R  = 0.5 * (lv[mapd(0, 1, 0, 2)] + lv[mapd(0, 1, -1, 2)]);
+
+    return 0.5 * ((w_R - w_M)/dy1 + (w_M - w_L)/dy0);
   }
 
   // Second derivative of turbulent u-component
@@ -224,12 +290,12 @@ inline RealType d2udydx(
     const RealType dx0   = 0.5 * (dx_0 + dx_M1);
     const RealType dx1   = 0.5 * (dx_0 + dx_P1);
 
-    RealType ViscT1 = lvis[mapd(0, 0, 1, 0)];
+    RealType ViscT1 = lvis[mapd(1, 0, 0, 0)];
     RealType ViscT2 = lvis[mapd(1, 0, 1, 0)];
     RealType ViscM1 = lvis[mapd(0, 0, 0, 0)];
-    RealType ViscM2 = lvis[mapd(1, 0, 0, 0)];
-    RealType ViscB1 = lvis[mapd(0, 0, -1, 0)];
-    RealType ViscB2 = lvis[mapd(1, 0, -1, 0)];
+    RealType ViscM2 = lvis[mapd(0, 0, 1, 0)];
+    RealType ViscB1 = lvis[mapd(-1, 0, 0, 0)];
+    RealType ViscB2 = lvis[mapd(-1, 0, 1, 0)];
 
     RealType dudzT = (lv[mapd(0, 0, 1, 0)] - lv[mapd(0, 0, 0, 0)]) / dz1;
     RealType dudzB = (lv[mapd(-1, 0, 1, 0)] - lv[mapd(-1, 0, 0, 0)]) / dz1;
@@ -308,8 +374,8 @@ inline RealType d2vdy2(
     const RealType dy1   = 0.5 * (dy_0 + dy_P1);
 
     const RealType dz_0  = lm[mapd(0, 0, 0, 2)];
-    const RealType dz_P1 = lm[mapd(1, 0, 0, 2)];
-    const RealType dz_M1 = lm[mapd(-1, 0, 0, 2)];
+    const RealType dz_P1 = lm[mapd(0, 0, 1, 2)];
+    const RealType dz_M1 = lm[mapd(0, 0, -1, 2)];
     const RealType dz0   = 0.5 * (dz_0 + dz_M1);
     const RealType dz1   = 0.5 * (dz_0 + dz_P1);
 
@@ -320,8 +386,8 @@ inline RealType d2vdy2(
     const RealType ViscL1 = lvis[mapd(0, 0, -1, 0)];
     const RealType ViscL2 = lvis[mapd(0, 1, -1, 0)];
 
-    RealType dvdzR = (lv[mapd(1, 0, 0, 1)] - lv[mapd(0, 0, 0, 1)]) / dz1;
-    RealType dvdzL = (lv[mapd(0, 0, 0, 1)] - lv[mapd(-1, 0, 0, 1)]) / dz0;
+    RealType dvdzR = (lv[mapd(0, 0, 1, 1)] - lv[mapd(0, 0, 0, 1)]) / dz1;
+    RealType dvdzL = (lv[mapd(0, 0, 0, 1)] - lv[mapd(0, 0, -1, 1)]) / dz0;
 
     RealType ViscR = (0.5 * (0.5 * (ViscR1 * dz_0 + ViscM1 * dz_P1) / dz1) * dy_P1
                       + 0.5 * (0.5 * (ViscR2 * dz_0 + ViscM2 * dz_P1) / dz1) * dy_0
@@ -376,7 +442,7 @@ inline RealType d2vdy2(
     const RealType* const lv, const RealType* const lvis, const Parameters& parameters, const RealType* const lm
   ) {
     const RealType dz_0  = lm[mapd(0, 0, 0, 2)];
-    const RealType dz_P1 = lm[mapd(1, 0, 0, 2)];
+    const RealType dz_P1 = lm[mapd(0, 0, 1, 2)];
     const RealType dz1   = 0.5 * (dz_0 + dz_P1);
 
     const RealType dy_0  = lm[mapd(0, 0, 0, 1)];
@@ -537,7 +603,7 @@ inline RealType d2wdydz(
     const RealType* const lv, const RealType* const lvis, const Parameters& parameters, const RealType* const lm
   ) {
     const RealType dy_0  = lm[mapd(0, 0, 0, 1)];
-    const RealType dy_P1 = lm[mapd(1, 0, 0, 1)];
+    const RealType dy_P1 = lm[mapd(0, 1, 0, 1)];
     const RealType dy1   = 0.5 * (dy_0 + dy_P1);
 
     const RealType dz_0  = lm[mapd(0, 0, 0, 2)];
@@ -550,11 +616,11 @@ inline RealType d2wdydz(
     RealType dwdyB = lv[mapd(0, 1, -1, 2)] - lv[mapd(0, 0, -1, 2)] / dy1;
 
     RealType ViscT1 = lvis[mapd(0, 0, 1, 0)];
-    RealType ViscT2 = lvis[mapd(1, 0, 1, 0)];
+    RealType ViscT2 = lvis[mapd(0, 1, 1, 0)];
     RealType ViscM1 = lvis[mapd(0, 0, 0, 0)];
-    RealType ViscM2 = lvis[mapd(1, 0, 0, 0)];
+    RealType ViscM2 = lvis[mapd(0, 1, 0, 0)];
     RealType ViscB1 = lvis[mapd(0, 0, -1, 0)];
-    RealType ViscB2 = lvis[mapd(1, 0, -1, 0)];
+    RealType ViscB2 = lvis[mapd(0, 1, -1, 0)];
 
     RealType ViscT = (0.5 * (0.5 * (ViscT1 * dy_P1 + ViscT2 * dy_0) / dy1) * dz_0
                       + 0.5 * (0.5 * (ViscM1 * dy_P1 + ViscM2 * dy_0) / dy1) * dz_P1
