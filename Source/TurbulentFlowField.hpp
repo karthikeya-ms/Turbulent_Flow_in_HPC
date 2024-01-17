@@ -13,6 +13,11 @@ private:
   ScalarField wall_h_; //! Scalar field representing the nearest wall height
   // const ?
 
+  //Terms for Spalart–Allmaras turbulence model
+  ScalarField Q_; //! Source term of characteristic viscosity
+  ScalarField Nabla_; //! Nabla term of characteristic viscosity
+  ScalarField ChVis_;//! Characteristic viscosity 
+
 public:
   /** Constructor for the 2D turbulent flow field */
   TurbulentFlowField(int Nx, int Ny);
@@ -27,6 +32,10 @@ public:
 
   ScalarField& getTurbVisc(); 
   ScalarField& getWallh(); 
+  ScalarField& getQ();
+  ScalarField& getNabla();
+  ScalarField& getChVis();
+
 
   void getPressureVelocityTurbVisc(RealType& pressure, RealType* const velocity, RealType& turbVisc, int i, int j);
   void getPressureVelocityTurbVisc(RealType& pressure, RealType* const velocity, RealType& turbVisc, int i, int j, int k);
