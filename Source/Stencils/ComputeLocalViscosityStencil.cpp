@@ -20,7 +20,9 @@ void Stencils::ComputeLocalViscosityStencil::apply(TurbulentFlowField& flowField
             RealType X      = flowField.getChVis().getScalar(i, j) * parameters_.flow.Re;
             RealType fv1    = pow(X, 3) / (pow(X, 3) + pow(parameters_.turbSA.cv1, 3));
 
-            turbViscVal     = fv1 * flowField.getChVis().getScalar(i, j);
+            turbViscVal     = fv1 * flowField.getChVis().getScalar(i, j); //  + 2/1000 
+            // spdlog::info("CheckVisc: X{}, turbVisc{}", X, turbViscVal);
+            // throw std::runtime_error("Stop at ComputeLocalViscStencil");
             flowField.getTurbVisc().getScalar(i, j) = turbViscVal;
         }
         

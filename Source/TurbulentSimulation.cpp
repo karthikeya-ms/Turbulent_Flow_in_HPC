@@ -19,6 +19,8 @@ TurbulentSimulation::TurbulentSimulation(Parameters& parameters, TurbulentFlowFi
   turbFGHIterator_(turbFlowField_, parameters, turbFGHStencil_),
 
   // Stencils and iterators for spalart allmaras model
+  ChViscosityInitStencil_(parameters),
+  ChViscosityInitIterator_(turbFlowField_, parameters, ChViscosityInitStencil_, 1, 0),
   ChViscosityStencil_(parameters),
   ChViscosityIterator_(turbFlowField_, parameters, ChViscosityStencil_, 1, 0),
   QStencil_(parameters),
@@ -33,6 +35,7 @@ void TurbulentSimulation::initializeFlowField() {
 
   Simulation::initializeFlowField(); // Same init as Simulation
   wallhIterator_.iterate(); // Calculation needed only once, hence here.
+  ChViscosityInitIterator_.iterate();
 
   spdlog::info("turbModel: {}", parameters_.simulation.turbModel);
   if (parameters_.simulation.turbModel == "turbMixing"){

@@ -3,7 +3,7 @@
     <flow Re="6000" />
     <simulation finalTime="10.0" >
         <type>turbulence</type>
-        <turbModel>turbMixing</turbModel>
+        <turbModel>turbSA</turbModel>
         <scenario>channel</scenario>
     </simulation>
     <turbMixing k="0.41" delta="2"/>

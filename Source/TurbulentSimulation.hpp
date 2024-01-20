@@ -12,6 +12,7 @@
 #include "Stencils/TurbulentFGHStencil.hpp"
 #include "Stencils/TurbulentVTKStencil.hpp" // turbulent visualisation
 
+#include "Stencils/ChViscosityInitStencil.hpp"
 #include "Stencils/ChViscosityStencil.hpp" // Spalart-Allmaras turbulence model stencils
 #include "Stencils/QStencil.hpp"
 #include "Stencils/NablaStencil.hpp"
@@ -29,6 +30,8 @@ protected:
   Stencils::TurbulentFGHStencil           turbFGHStencil_;
   FieldIterator<TurbulentFlowField>       turbFGHIterator_;
 
+  Stencils::ChViscosityInitStencil        ChViscosityInitStencil_;
+  FieldIterator<TurbulentFlowField>       ChViscosityInitIterator_;
   Stencils::ChViscosityStencil            ChViscosityStencil_;
   FieldIterator<TurbulentFlowField>       ChViscosityIterator_;
   Stencils::QStencil                      QStencil_;
