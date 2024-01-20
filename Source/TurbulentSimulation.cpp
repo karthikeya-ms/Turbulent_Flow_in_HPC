@@ -17,15 +17,15 @@ TurbulentSimulation::TurbulentSimulation(Parameters& parameters, TurbulentFlowFi
   maxTurbViscIterator_(turbFlowField_, parameters, maxTurbViscStencil_, 1, 0), // Thanks to Field Iterator Implementation
   turbFGHStencil_(parameters),
   turbFGHIterator_(turbFlowField_, parameters, turbFGHStencil_),
-  parallel_manager_(parameters, flowField),
 
   // Stencils and iterators for spalart allmaras model
   ChViscosityStencil_(parameters),
-  ChViscosityIterator_(turbFlowField_, parameters, ChViscosityStencil_),
+  ChViscosityIterator_(turbFlowField_, parameters, ChViscosityStencil_, 1, 0),
   QStencil_(parameters),
-  QIterator_(turbFlowField_, parameters, QStencil_),
+  QIterator_(turbFlowField_, parameters, QStencil_, 1, 0),
   NablaStencil_(parameters),
-  NablaIterator_(turbFlowField_, parameters, NablaStencil_)
+  NablaIterator_(turbFlowField_, parameters, NablaStencil_, 1, 0),
+  parallel_manager_(parameters, flowField)
 {
 }
 
@@ -33,8 +33,12 @@ void TurbulentSimulation::initializeFlowField() {
 
   Simulation::initializeFlowField(); // Same init as Simulation
   wallhIterator_.iterate(); // Calculation needed only once, hence here.
-  spdlog::info("delta: {}", parameters_.turbMix.delta);
-  spdlog::info("scenario: {}",parameters_.simulation.scenario);
+
+  spdlog::info("turbModel: {}", parameters_.simulation.turbModel);
+  if (parameters_.simulation.turbModel == "turbMixing"){
+    spdlog::info("MixingOpt: {}", parameters_.turbMix.delta);
+  }
+  spdlog::info("scenario: {}", parameters_.simulation.scenario);
 }
 
 void TurbulentSimulation::solveTimestep() {

@@ -23,16 +23,16 @@ void Stencils::QStencil::apply(TurbulentFlowField& flowField, int i, int j)
     const RealType X = ChVis * parameters_.flow.Re;
     const RealType fv1 = pow(X, 3) / (pow(X, 3) + pow(cv1, 3));
     const RealType fv2 = 1 - X / (1 + X * fv1);
-    const RealType S_ = S + fv2 * ChVis / (pow(k, 2) * pow(d, 2));
+    const RealType S_ = S + fv2 * ChVis / (pow(_k, 2) * pow(d, 2));
 
     const RealType ft2 = ct3 * exp(ct4 * pow(X, 2) * (-1.0));
 
-    const RealType r = ChVis / (S_ * pow(k, 2) * pow(d, 2));
+    const RealType r = ChVis / (S_ * pow(_k, 2) * pow(d, 2));
     const RealType g = r + cw2 * (pow(r, 6) - r);
     const RealType fw = g * pow(((1 + pow(cw3, 6)) / (pow(g, 6) + pow(cw3, 6))), 0.1667);
     
     flowField.getQ().getScalar(i,j) = cb1 * S_ * ChVis * (1 - ft2) 
-                                    + (cb1 * ft2 / pow(k, 2) - cw1 * fw) * pow(ChVis / d, 2);
+                                    + (cb1 * ft2 / pow(_k, 2) - cw1 * fw) * pow(ChVis / d, 2);
 }
 
 void Stencils::QStencil::apply(TurbulentFlowField& flowField, int i, int j, int k)
@@ -55,14 +55,17 @@ void Stencils::QStencil::apply(TurbulentFlowField& flowField, int i, int j, int 
     const RealType X = ChVis * parameters_.flow.Re;
     const RealType fv1 = pow(X, 3) / (pow(X, 3) + pow(cv1, 3));
     const RealType fv2 = 1 - X / (1 + X * fv1);
-    const RealType S_ = S + fv2 * ChVis / (pow(k, 2) * pow(d, 2));
+    const RealType S_ = S + fv2 * ChVis / (pow(_k, 2) * pow(d, 2));
+
+    // spdlog::info("CheckQ: {} {}", X, fv1);
+    // throw std::runtime_error("Stop at QStencil");
 
     const RealType ft2 = ct3 * exp(ct4 * pow(X, 2) * (-1.0));
 
-    const RealType r = ChVis / (S_ * pow(k, 2) * pow(d, 2));
+    const RealType r = ChVis / (S_ * pow(_k, 2) * pow(d, 2));
     const RealType g = r + cw2 * (pow(r, 6) - r);
     const RealType fw = g * pow(((1 + pow(cw3, 6)) / (pow(g, 6) + pow(cw3, 6))), 0.1667);
     
     flowField.getQ().getScalar(i,j,k) = cb1 * S_ * ChVis * (1 - ft2) 
-                                    + (cb1 * ft2 / pow(k, 2) - cw1 * fw) * pow(ChVis / d, 2);
+                                    + (cb1 * ft2 / pow(_k, 2) - cw1 * fw) * pow(ChVis / d, 2);
 }

@@ -28,18 +28,18 @@ namespace ParallelManagers {
     Stencils::VelocityBufferFillStencil fillVelocityStencil;
     
     Stencils::VelocityBufferReadStencil readVelocityStencil;
+
+    ParallelBoundaryIterator<FlowField> velocityfillIterator;
+    
+    ParallelBoundaryIterator<FlowField> velocityreadIterator;
     
     Stencils::PressureBufferFillStencil fillPressureStencil;
     
     Stencils::PressureBufferReadStencil readPressureStencil;
     
-    ParallelBoundaryIterator<FlowField> velocityfillIterator;
-    
-    ParallelBoundaryIterator<FlowField> velocityreadIterator;
-    
-    ParallelBoundaryIterator<FlowField> pressurereadIterator;
-    
     ParallelBoundaryIterator<FlowField> pressurefillIterator;
+        
+    ParallelBoundaryIterator<FlowField> pressurereadIterator;
 
   public:
     

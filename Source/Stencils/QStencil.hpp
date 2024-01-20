@@ -21,7 +21,7 @@ namespace Stencils {
     RealType cw1 = parameters_.turbSA.cw1;
     RealType cw2 = parameters_.turbSA.cw2;
     RealType cw3 = parameters_.turbSA.cw3;
-    RealType k = parameters_.turbSA.k;
+    RealType _k  = parameters_.turbSA.k;
 
   public:
     QStencil(const Parameters& parameters);

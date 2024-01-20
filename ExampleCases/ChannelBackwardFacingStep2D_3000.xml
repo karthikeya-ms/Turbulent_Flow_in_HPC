@@ -3,9 +3,13 @@
     <flow Re="3000" />
     <simulation finalTime="30.0" >
         <type>turbulence</type>
+        <turbModel>turbMixing</turbModel>
         <scenario>channel</scenario>
     </simulation>
     <turbMixing k="0.41" delta="2"/>
+    <turbSA cb1="0.1355" cb2="0.6220" cb3="0.6667" 
+        cv1="7.1" cw1="3.2391" cw2="0.3" cw3="2.0" 
+        ct3="1.2" ct4="0.5" k="0.41"/>
     <backwardFacingStep xRatio="0.2" yRatio="0.2" />
     <timestep dt="1" tau="0.5" />
     <solver gamma="0.5" />

@@ -38,8 +38,8 @@ protected:
   
   Stencils::FGHStencil     fghStencil_;
   FieldIterator<FlowField> fghIterator_;
-  FieldIterator<FlowField> rhsIterator_;
   Stencils::RHSStencil     rhsStencil_;
+  FieldIterator<FlowField> rhsIterator_;
 
   Stencils::VelocityStencil velocityStencil_;
   Stencils::ObstacleStencil obstacleStencil_;
