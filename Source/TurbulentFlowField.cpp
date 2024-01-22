@@ -8,8 +8,8 @@ TurbulentFlowField::TurbulentFlowField(int Nx, int Ny):
   wall_h_(ScalarField(Nx + 3, Ny + 3)),
   Q_(ScalarField(Nx + 3, Ny + 3)),
   Nabla_(ScalarField(Nx + 3, Ny + 3)),
-  ChVis_(ScalarField(Nx + 3, Ny + 3))
- {
+  OldChVis_(ScalarField(Nx + 3, Ny + 3)),
+  NewChVis_(ScalarField(Nx + 3, Ny + 3)){
 
   ASSERTION(Nx > 0);
   ASSERTION(Ny > 0);
@@ -19,9 +19,10 @@ TurbulentFlowField::TurbulentFlowField(int Nx, int Ny, int Nz):
   FlowField::FlowField(Nx, Ny, Nz),
   turb_visc_(ScalarField(Nx + 3, Ny + 3, Nz + 3)),
   wall_h_(ScalarField(Nx + 3, Ny + 3, Nz + 3)),
-  Q_(ScalarField(Nx + 3, Ny + 3)),
-  Nabla_(ScalarField(Nx + 3, Ny + 3)),
-  ChVis_(ScalarField(Nx + 3, Ny + 3)) {
+  Q_(ScalarField(Nx + 3, Ny + 3, Nz + 3)),
+  Nabla_(ScalarField(Nx + 3, Ny + 3, Nz + 3)),
+  OldChVis_(ScalarField(Nx + 3, Ny + 3, Nz + 3)),
+  NewChVis_(ScalarField(Nx + 3, Ny + 3, Nz + 3)){
   
   ASSERTION(Nx > 0);
   ASSERTION(Ny > 0);
@@ -50,7 +51,12 @@ TurbulentFlowField::TurbulentFlowField(const Parameters& parameters):
     ScalarField(parameters.parallel.localSize[0] + 3, parameters.parallel.localSize[1] + 3) : 
     ScalarField(parameters.parallel.localSize[0] + 3, parameters.parallel.localSize[1] + 3, parameters.parallel.localSize[2] + 3)
   ),
-  ChVis_(
+  OldChVis_(
+    parameters.geometry.dim == 2 ? 
+    ScalarField(parameters.parallel.localSize[0] + 3, parameters.parallel.localSize[1] + 3) : 
+    ScalarField(parameters.parallel.localSize[0] + 3, parameters.parallel.localSize[1] + 3, parameters.parallel.localSize[2] + 3)
+  ),
+  NewChVis_(
     parameters.geometry.dim == 2 ? 
     ScalarField(parameters.parallel.localSize[0] + 3, parameters.parallel.localSize[1] + 3) : 
     ScalarField(parameters.parallel.localSize[0] + 3, parameters.parallel.localSize[1] + 3, parameters.parallel.localSize[2] + 3)
@@ -65,7 +71,13 @@ ScalarField& TurbulentFlowField::getQ() { return Q_; }
 
 ScalarField& TurbulentFlowField::getNabla() { return Nabla_; }
 
-ScalarField& TurbulentFlowField::getChVis() { return ChVis_; }
+ScalarField& TurbulentFlowField::getOldChVis() { return OldChVis_; }
+
+ScalarField& TurbulentFlowField::getNewChVis() { return NewChVis_; }
+
+void TurbulentFlowField::setOldChVis(){
+  OldChVis_ = NewChVis_;
+}
 
 
 void TurbulentFlowField::getPressureVelocityTurbVisc(RealType& pressure, RealType* const velocity, RealType& turbVisc, int i, int j) {

@@ -20,7 +20,7 @@ TurbulentSimulation::TurbulentSimulation(Parameters& parameters, TurbulentFlowFi
 
   // Stencils and iterators for spalart allmaras model
   ChViscosityInitStencil_(parameters),
-  ChViscosityInitIterator_(turbFlowField_, parameters, ChViscosityInitStencil_, 1, 0),
+  ChViscosityInitIterator_(turbFlowField_, parameters, ChViscosityInitStencil_, 1, 0), // Inside domain channel
   ChViscosityStencil_(parameters),
   ChViscosityIterator_(turbFlowField_, parameters, ChViscosityStencil_, 1, 0),
   QStencil_(parameters),
@@ -35,7 +35,7 @@ void TurbulentSimulation::initializeFlowField() {
 
   Simulation::initializeFlowField(); // Same init as Simulation
   wallhIterator_.iterate(); // Calculation needed only once, hence here.
-  ChViscosityInitIterator_.iterate();
+  // ChViscosityInitIterator_.iterate();
 
   spdlog::info("turbModel: {}", parameters_.simulation.turbModel);
   if (parameters_.simulation.turbModel == "turbMixing"){
@@ -54,14 +54,6 @@ void TurbulentSimulation::solveTimestep() {
   // Determine and set max. timestep which is allowed in this simulation
   parallel_manager_.communicateVelocity();
   setTimeStep();
-  //Compute source terms in Spalart-Allmaras model
-  QIterator_.iterate();
-  //Compute Nabla terms in Spalart-Allmaras model
-  NablaIterator_.iterate();
-  //Compute characteristic viscosity
-  ChViscosityIterator_.iterate();
-  // Compute local viscosities
-  turbViscIterator_.iterate();
   // Compute FGH
   turbFGHIterator_.iterate();
   // Set global boundary values
@@ -79,6 +71,17 @@ void TurbulentSimulation::solveTimestep() {
   // TODO WS2: communicate velocity values
   // Iterate for velocities on the boundary
   wallVelocityIterator_.iterate();
+  
+  //Compute source terms in Spalart-Allmaras model
+  // QIterator_.iterate();
+  //Compute Nabla terms in Spalart-Allmaras model
+  // NablaIterator_.iterate();
+  //Compute characteristic viscosity
+  // ChViscosityIterator_.iterate();
+  // Compute local viscosities
+  turbViscIterator_.iterate();
+  // Update current ChVisc values
+  turbFlowField_.setOldChVis();
 }
 
 void TurbulentSimulation::plotVTK(int timeStep, RealType simulationTime) {

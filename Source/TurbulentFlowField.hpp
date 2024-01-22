@@ -16,7 +16,8 @@ private:
   //Terms for Spalart–Allmaras turbulence model
   ScalarField Q_; //! Source term of characteristic viscosity
   ScalarField Nabla_; //! Nabla term of characteristic viscosity
-  ScalarField ChVis_;//! Characteristic viscosity 
+  ScalarField OldChVis_;//! Characteristic viscosity 
+  ScalarField NewChVis_;//! Characteristic viscosity 
 
 public:
   /** Constructor for the 2D turbulent flow field */
@@ -34,7 +35,9 @@ public:
   ScalarField& getWallh(); 
   ScalarField& getQ();
   ScalarField& getNabla();
-  ScalarField& getChVis();
+  ScalarField& getOldChVis();
+  ScalarField& getNewChVis();
+  void setOldChVis();
 
 
   void getPressureVelocityTurbVisc(RealType& pressure, RealType* const velocity, RealType& turbVisc, int i, int j);

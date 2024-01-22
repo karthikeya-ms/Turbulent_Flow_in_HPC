@@ -97,6 +97,24 @@ private:
   void initialize();
 
 public:
+  /**
+   * @brief Copy assignment constructor
+   *
+   * @param original: the original object
+   * @return ScalarField& reference of the copied object
+   */
+  ScalarField& operator=(const ScalarField& original) {
+    ASSERTION(sizeX_ == original.sizeX_);
+    ASSERTION(sizeY_ == original.sizeY_);
+    ASSERTION(sizeZ_ == original.sizeZ_);
+    ASSERTION(components_ == original.components_);
+    ASSERTION(size_ == original.size_);
+
+    for (int i = 0; i < size_; i++) {
+      data_[i] = original.data_[i];
+    }
+    return *this;
+  }
   /** 2D scalar field constructor.
    *
    * Sets the size of the data array and allocates data for the 2D field
