@@ -75,10 +75,13 @@ void TurbulentSimulation::solveTimestep() {
   // Compute velocity
   velocityIterator_.iterate();
   obstacleIterator_.iterate();
-   parallel_manager_.communicateVelocity();
+  parallel_manager_.communicateVelocity();
   // TODO WS2: communicate velocity values
   // Iterate for velocities on the boundary
   wallVelocityIterator_.iterate();
+
+    
+  parallel_manager_.communicateChViscosity();
 }
 
 void TurbulentSimulation::plotVTK(int timeStep, RealType simulationTime) {

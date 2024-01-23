@@ -12,6 +12,8 @@
 #include "Stencils/VelocityBufferReadStencil.hpp"
 #include "Stencils/ViscosityBufferFillStencil.hpp"
 #include "Stencils/ViscosityBufferReadStencil.hpp"
+#include "Stencils/ChViscosityBufferFillStencil.hpp"
+#include "Stencils/ChViscosityBufferReadStencil.hpp"
 
 namespace ParallelManagers {
   class PetscParallelManager {
@@ -66,11 +68,21 @@ namespace ParallelManagers {
     
     ParallelBoundaryIterator<TurbulentFlowField> viscosityreadIterator;
 
+    Stencils::ChViscosityBufferFillStencil fillChViscosityStencil;
+    
+    Stencils::ChViscosityBufferReadStencil readChViscosityStencil;
+    
+    ParallelBoundaryIterator<TurbulentFlowField> ChviscosityfillIterator;
+    
+    ParallelBoundaryIterator<TurbulentFlowField> ChviscosityreadIterator;
+
   public:
     
     PetscTurbulentParallelManager(Parameters& parameters, TurbulentFlowField& flowfield);
     
     void communicateViscosity();
+
+    void communicateChViscosity();
     
     virtual ~PetscTurbulentParallelManager() = default;
   };
