@@ -17,10 +17,42 @@ void Stencils::ComputeLocalViscosityStencil::apply(TurbulentFlowField& flowField
         RealType turbViscVal = 0.0;
         if (parameters_.simulation.turbModel == "turbSA"){
             // Spalart allmaras turbulence model
+
+            //***********************************************
+            // Boundary Conditions for nu_transport:
+            //***********************************************
+
+            // Boundary condition for ONLY channel flow
+            if ((parameters_.bfStep.xRatio * parameters_.geometry.sizeX <= 0) && (parameters_.bfStep.yRatio * parameters_.geometry.sizeY <= 0)) {
+                // at the lower wall of the channel (no slip)
+                if (((j + parameters_.parallel.firstCorner[1]) == 2) && ((i + parameters_.parallel.firstCorner[0]) > 1)) {
+                flowField.getChVis().getScalar(
+                    i, j - 1
+                ) = -flowField.getChVis().getScalar(i, j);
+                }
+                // at the top wall of the channel (no slip)
+                if (((j + parameters_.parallel.firstCorner[1]) == parameters_.geometry.sizeY + 1) && ((i + parameters_.parallel.firstCorner[0]) > 1)) {
+                flowField.getChVis().getScalar(
+                    i, j + 1
+                ) = -flowField.getChVis().getScalar(i, j);
+                }
+                // at the inlet of the channel
+                if (((i + parameters_.parallel.firstCorner[0]) == 2) && ((j + parameters_.parallel.firstCorner[1]) > 1)) {
+                flowField.getChVis().getScalar(i - 1, j) = 3.0 / parameters_.flow.Re;
+                }
+                // //at the outlet of the channel
+                if (((i + parameters_.parallel.firstCorner[0]) == parameters_.geometry.sizeX + 1) && ((j + parameters_.parallel.firstCorner[1]) > 1)) {
+                flowField.getChVis().getScalar(
+                    i + 1, j
+                ) = flowField.getChVis().getScalar(i, j);
+                // std::cout<<"here"<<std::endl;
+                }
+
+            }
             RealType X      = flowField.getChVis().getScalar(i, j) * parameters_.flow.Re;
             RealType fv1    = pow(X, 3) / (pow(X, 3) + pow(parameters_.turbSA.cv1, 3));
 
-            turbViscVal     = fv1 * flowField.getChVis().getScalar(i, j); //  + 2/1000 
+            turbViscVal     = fv1 * flowField.getChVis().getScalar(i, j); 
             // spdlog::info("CheckVisc: X{}, turbVisc{}", X, turbViscVal);
             // throw std::runtime_error("Stop at ComputeLocalViscStencil");
             flowField.getTurbVisc().getScalar(i, j) = turbViscVal;

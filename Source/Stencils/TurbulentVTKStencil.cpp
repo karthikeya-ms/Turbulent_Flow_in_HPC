@@ -165,7 +165,7 @@ void Stencils::TurbulentVTKStencil::write(TurbulentFlowField& flowField, int tim
 
     // Write turbVisc    
     ofile_ 
-      << "SCALARS turbVisc float 1" << std::endl
+      << "SCALARS turbVisc double 1" << std::endl
       << "LOOKUP_TABLE default" << std::endl;
     ofile_ << turbViscStream_.str() << std::endl;
     turbViscStream_.str("");
@@ -187,7 +187,7 @@ void Stencils::TurbulentVTKStencil::write(TurbulentFlowField& flowField, int tim
 
     // Write turbVisc    
     ofile_ 
-      << "SCALARS turbVisc float 1" << std::endl
+      << "SCALARS turbVisc double 1" << std::endl
       << "LOOKUP_TABLE default" << std::endl;
     ofile_ << turbViscStream_.str() << std::endl;
     turbViscStream_.str("");
