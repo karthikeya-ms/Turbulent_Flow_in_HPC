@@ -49,6 +49,8 @@ void Stencils::ComputeLocalViscosityStencil::apply(TurbulentFlowField& flowField
                 }
 
             }
+
+
             RealType X      = flowField.getChVis().getScalar(i, j) * parameters_.flow.Re;
             RealType fv1    = pow(X, 3) / (pow(X, 3) + pow(parameters_.turbSA.cv1, 3));
 
@@ -141,6 +143,56 @@ void Stencils::ComputeLocalViscosityStencil::apply(TurbulentFlowField& flowField
         RealType turbViscVal = 0.0;
         if (parameters_.simulation.turbModel == "turbSA"){
             //Spalart allmaras turbulence model
+
+            //***********************************************
+            // Boundary Conditions for nu_transport:
+            //***********************************************
+            // Boundary condition for CHANNEL FLOW 3D
+            if ((parameters_.bfStep.xRatio * parameters_.geometry.sizeX <= 0) && (parameters_.bfStep.yRatio * parameters_.geometry.sizeY <= 0)  ) {
+
+                // at the lower wall of the channel (no slip)
+                if (((j + parameters_.parallel.firstCorner[1]) == 2) && ((k + parameters_.parallel.firstCorner[2]) > 1) && ((i + parameters_.parallel.firstCorner[0]) > 1)) {
+                flowField.getChVis().getScalar(
+                    i, j - 1, k
+                ) = -flowField.getChVis().getScalar(i, j, k);
+                }
+
+                // at the top wall of the channel (no slip)
+                if (((j + parameters_.parallel.firstCorner[1]) == parameters_.geometry.sizeY + 1) && ((k + parameters_.parallel.firstCorner[2]) > 1) && ((i + parameters_.parallel.firstCorner[0]) > 1)) {
+                flowField.getChVis().getScalar(
+                    i, j + 1, k
+                ) = -flowField.getChVis().getScalar(i, j, k);
+                }
+
+                // at the front wall of the channel (no slip)
+                if (((k + parameters_.parallel.firstCorner[2]) == 2) && ((j + parameters_.parallel.firstCorner[1]) > 1) && ((i + parameters_.parallel.firstCorner[0]) > 1)) {
+                flowField.getChVis().getScalar(
+                    i, j, k - 1
+                ) = -flowField.getChVis().getScalar(i, j, k);
+                }
+
+                // at the back wall of the channel (no slip)
+                if (((k + parameters_.parallel.firstCorner[2]) == parameters_.geometry.sizeZ + 1) && ((j + parameters_.parallel.firstCorner[0]) > 1) && ((i + parameters_.parallel.firstCorner[0]) > 1)) {
+                flowField.getChVis().getScalar(
+                    i, j, k + 1
+                ) = -flowField.getChVis().getScalar(i, j, k);
+                }
+
+                // at the inlet of the channel generating constant turbulent transport visc throughout the duration of the
+                // simulation
+                if (((i + parameters_.parallel.firstCorner[0]) == 2) && ((j + parameters_.parallel.firstCorner[1]) > 1) && ((k + parameters_.parallel.firstCorner[2]) > 1)) {
+                flowField.getChVis().getScalar(i - 1, j, k) = 3.0 / parameters_.flow.Re;
+                }
+
+                // at the outlet of the channel
+                if (((i + parameters_.parallel.firstCorner[0]) == parameters_.geometry.sizeX + 1) && ((j + parameters_.parallel.firstCorner[1]) > 1) && ((k + parameters_.parallel.firstCorner[2]) > 1)) {
+                flowField.getChVis().getScalar(
+                    i + 1, j, k
+                ) = flowField.getChVis().getScalar(i, j, k);
+                }
+
+            } // end of BC for 3D Channel    
+
             RealType X      = flowField.getChVis().getScalar(i, j, k) * parameters_.flow.Re;
             RealType fv1    = pow(X, 3) / (pow(X, 3) + pow(parameters_.turbSA.cv1, 3));
 

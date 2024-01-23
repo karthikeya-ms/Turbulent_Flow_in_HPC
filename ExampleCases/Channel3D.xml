@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <configuration>
-    <flow Re="6000" />
-    <simulation finalTime="10.0" >
+    <flow Re="10000" />
+    <simulation finalTime="20.0" >
         <type>turbulence</type>
         <turbModel>turbSA</turbModel>
         <scenario>channel</scenario>
@@ -16,7 +16,7 @@
       dim="3"
       lengthX="5.0" lengthY="1.0" lengthZ="1.0"
       sizeX="40" sizeY="20" sizeZ="20"
-      stretchX="false" stretchY="true" stretchZ="true"
+      stretchX="false" stretchY="false" stretchZ="false"
     >
       <mesh>uniform</mesh>
       <!--mesh>stretched</mesh-->
