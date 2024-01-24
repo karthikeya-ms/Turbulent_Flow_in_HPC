@@ -62,8 +62,3 @@ Instead of using `make`, run `VERBOSE=1 make`. You can also run `make -n` to inv
 
 ### How can I see the test output?
 Instead of using `make test`, run `ctest --verbose`.
-
-### Accessing Linux Cluster
-
-
-

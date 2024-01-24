@@ -14,8 +14,6 @@ Parameters::Parameters():
   parallel{},
   stdOut{},
   bfStep{},
-  turbMix{},
-  turbSA{},
   meshsize(NULL) {}
 
 Parameters::~Parameters() {

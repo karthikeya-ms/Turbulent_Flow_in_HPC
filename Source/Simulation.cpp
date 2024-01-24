@@ -2,8 +2,6 @@
 
 #include "Simulation.hpp"
 #include <cfenv>
-#include <mpi.h>
-
 
 #include "Solvers/PetscSolver.hpp"
 #include "Solvers/SORSolver.hpp"
@@ -19,22 +17,21 @@ Simulation::Simulation(Parameters& parameters, FlowField& flowField):
   globalBoundaryFactory_(parameters),
   wallVelocityIterator_(globalBoundaryFactory_.getGlobalBoundaryVelocityIterator(flowField_)),
   wallFGHIterator_(globalBoundaryFactory_.getGlobalBoundaryFGHIterator(flowField_)),
-  fghStencil_(parameters),
-  fghIterator_(flowField_, parameters, fghStencil_),
+  fghStencil_(parameters), 
   rhsStencil_(parameters),
-  rhsIterator_(flowField_, parameters, rhsStencil_),
+  fghIterator_(flowField_, parameters, fghStencil_),
+  rhsIterator_(flowField, parameters, rhsStencil_),
   velocityStencil_(parameters),
   obstacleStencil_(parameters),
   velocityIterator_(flowField_, parameters, velocityStencil_),
-  obstacleIterator_(flowField_, parameters, obstacleStencil_),
+  obstacleIterator_(flowField_, parameters, obstacleStencil_)
 #ifdef ENABLE_PETSC
-  solver_(std::make_unique<Solvers::PetscSolver>(flowField_, parameters)),
+  ,
+  solver_(std::make_unique<Solvers::PetscSolver>(flowField_, parameters))
 #else
-  solver_(std::make_unique<Solvers::SORSolver>(flowField_, parameters)),
+  ,
+  solver_(std::make_unique<Solvers::SORSolver>(flowField_, parameters))
 #endif
-
-  parallel_manager_(parameters, flowField)
-
 {
 }
 
@@ -95,12 +92,10 @@ void Simulation::solveTimestep() {
   rhsIterator_.iterate();
   // Solve for pressure
   solver_->solve();
-  parallel_manager_.communicatePressure();
   // TODO WS2: communicate pressure values
   // Compute velocity
   velocityIterator_.iterate();
   obstacleIterator_.iterate();
-  parallel_manager_.communicateVelocity();
   // TODO WS2: communicate velocity values
   // Iterate for velocities on the boundary
   wallVelocityIterator_.iterate();
