@@ -65,7 +65,7 @@ public:
 
   inline virtual RealType getPosX([[maybe_unused]] int i, [[maybe_unused]] int j, [[maybe_unused]] int k)
     const override {
-    return dx_ * (firstCornerX_ - 2 + i);
+    return dx_ * (firstCornerX_ - 2 + i);//for the number of ghost layer we need minus 2.
   }
   inline virtual RealType getPosY([[maybe_unused]] int i, [[maybe_unused]] int j, [[maybe_unused]] int k)
     const override {

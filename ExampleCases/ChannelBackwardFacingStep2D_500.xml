@@ -1,17 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <configuration>
-    <flow Re="100" />
+    <flow Re="500" />
     <simulation finalTime="10.0" >
-        <type>dns</type>
+        <type>turbulence</type>
+        <turbModel>turbMixing</turbModel>
         <scenario>channel</scenario>
     </simulation>
+    <turbMixing k="0.41" delta="2"/>
+    <turbSA cb1="0.1355" cb2="0.6220" cb3="0.6667" 
+        cv1="7.1" cw1="3.2391" cw2="0.3" cw3="2.0" 
+        ct3="1.2" ct4="0.5" k="0.41"/>
+    <backwardFacingStep xRatio="0.2" yRatio="0.2" />
     <timestep dt="1" tau="0.5" />
     <solver gamma="0.5" />
     <geometry
       dim="2"
       lengthX="5.0" lengthY="1.0" lengthZ="1.0"
       sizeX="10" sizeY="20" sizeZ="10"
-      stretchX="false" stretchY="true" stretchZ="true"
+      stretchX="false" stretchY="false" stretchZ="false"
     >
       <mesh>uniform</mesh>
       <!--mesh>stretched</mesh-->
@@ -37,7 +43,7 @@
             <vector x="0" y="0" z="0" />
         </back>
     </walls>
-    <vtk interval="0.1">Channel2D</vtk>
+    <vtk interval="0.1">ChannelBackwardFacingStep2D_500_1</vtk>
     <stdOut interval="0.0001" />
     <parallel numProcessorsX="1" numProcessorsY="1" numProcessorsZ="1" />
 </configuration>

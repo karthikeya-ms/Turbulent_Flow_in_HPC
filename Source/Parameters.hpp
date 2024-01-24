@@ -1,5 +1,7 @@
 #pragma once
 
+#include <mpi.h>
+#include <petscsystypes.h>
 #include "BoundaryType.hpp"
 #include "Definitions.hpp"
 #include "Meshsize.hpp"
@@ -16,6 +18,7 @@ class SimulationParameters {
 public:
   RealType    finalTime = 0; //! Final time for the simulation
   std::string type;          //! Type of the simulation (DNS vs. Turbulence)
+  std::string turbModel;     //! Turbulence model used (only when type=="turbulence")
   std::string scenario;      //! If channel or cavity, for example
 };
 
@@ -134,6 +137,29 @@ public:
 };
 //@}
 
+class TurbMixingParameters {
+public:
+  RealType k = 0;
+  int  delta = 0;
+};
+//@}
+
+class TurbSAParameters {
+public:
+  RealType cb1 = 0.1355;
+  RealType cb2 = 0.6220;
+  RealType cb3 = 0.6667; //represent 2/3
+  RealType cv1 = 7.1;
+  RealType cw1 = 3.2391; //represent (cb1 / pow(k, 2)) + ((1 + cb2) / cb3)
+  RealType cw2 = 0.3;
+  RealType cw3 = 2.0;
+  RealType ct3 = 1.2;
+  RealType ct4 = 0.5;
+  RealType k = 0.41;
+};
+//Parameters used in Spalart–Allmaras turbulence model
+
+
 /** A class to store and pass around the parameters
  */
 class Parameters {
@@ -152,7 +178,8 @@ public:
   ParallelParameters      parallel;
   StdOutParameters        stdOut;
   BFStepParameters        bfStep;
-
+  TurbMixingParameters    turbMix;
+  TurbSAParameters        turbSA;
 
   // TODO WS2: include parameters for turbulence
   Meshsize* meshsize;

@@ -66,3 +66,14 @@ dkms.conf
 
 # Misc
 .DS_Store
+.vscode
+*.pdf
+Documentation/tectonic
+*.aux
+*.fdb*
+*.fls 
+*.log
+*.synctex*
+.nfs*
+
+!Report/main.pdf

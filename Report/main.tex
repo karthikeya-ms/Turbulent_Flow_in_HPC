@@ -1,0 +1,480 @@
+%%
+% This is an Overleaf template for scientific articles and reports
+% using the TUM Corporate Desing https://www.tum.de/cd
+%
+% For further details on how to use the template, take a look at our
+% GitLab repository and browse through our test documents
+% https://gitlab.lrz.de/latex4ei/tum-templates.
+%
+% The tumarticle class is based on the KOMA-Script class scrartcl.
+% If you need further customization please consult the KOMA-Script guide
+% https://ctan.org/pkg/koma-script.
+% Additional class options are passed down to the base class.
+%
+% If you encounter any bugs or undesired behaviour, please raise an issue
+% in our GitLab repository
+% https://gitlab.lrz.de/latex4ei/tum-templates/issues
+% and provide a description and minimal working example of your problem.
+%%
+
+
+\documentclass[
+  english,        % define the document language (english, german)
+  font=palatino,     % define main text font (helvet, times, palatino, libertine)
+  onecolumn,      % use onecolumn or twocolumn layout
+]{tumarticle}
+
+
+% load additional packages
+\usepackage{lipsum}
+
+
+% article metadata
+\title{Worksheet 2}
+% \subtitle{Subtitle of the article}
+
+\author{Haotian Ji}
+\author{Siva Karthikeya Mandarapu}
+\author{Hari Surya Charan Mudragada}
+\author{Matilde Tozzi}
+
+
+\date{December, 2023}
+
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+  This is a short abstract summarizing the main points of your article.
+\end{abstract}
+
+\section{Parallelization (30\%)}
+
+
+We looked at the \texttt{ParallelBoundaryIterator}, which operates on the border of a process domain and operates separately on the top, bottom, left and right faces (in 3D, on the front and back faces too). The stencil used by the iterator needs to have the functions \texttt{applyXWall}, where \texttt{X} is the various sides respectively. We decided to use this iterator and a similar structure for our stencils \texttt{PressureBufferFillStencil}, \texttt{PressureBufferReadStencil}, \texttt{VelocityBufferFillStencil} and \texttt{VelocityBufferReadStencil}.
+
+We then integrated these operations in \texttt{PetscParallelManager}, that uses the methods \\\texttt{communicatePressure} and \texttt{communicateVelocity} to call \texttt{MPI\_Sendrecv}. The calls to this class were added in the class \texttt{Simulation}.
+
+\section{Scaling and Efficiency (20\%)}
+
+The setting for each test scenario can be found in the \nameref{appendix}. As suggested, we also switched off the VTK output because it is not parallelized.
+
+\subsection{Cavity 2D}
+
+The execution time without \texttt{mpirun} is 16250192ns. This is the situation with different parallel domains:
+
+\begin{tabular}{c r}
+  Parallel Domain & Time                \\
+  1x1x1           & \textbf{14985779ns} \\
+  2x1x1           & \textbf{14690334ns} \\
+  1x2x1           & 50765780ns          \\
+  2x2x1           & 1019181815ns        \\
+  4x2x1           & 2389953446ns        \\
+  2x4x1           & 11321946305ns       \\
+  4x4x1           & 739662694867ns      \\
+\end{tabular}
+
+\subsection{Cavity 3D}
+
+\begin{tabular}{c r}
+  Parallel Domain & Time                 \\
+  Sequential      & 366442960ns          \\
+  1x1x1           & 462171744ns          \\
+  2x2x2           & \textbf{134857738ns} \\
+  3x3x3           & 428625311ns          \\
+\end{tabular}
+
+\subsection{Channel 2D}
+
+\begin{tabular}{c r}
+  Parallel Domain & Time         \\
+  Sequential      & 35474301ns   \\
+  1x1x1           & 43235603ns   \\
+  2x1x1           & 50968602ns   \\
+  1x2x1           & 74672623ns   \\
+  2x2x1           & 71535312ns   \\
+  4x2x1           & 72784482ns   \\
+  2x4x1           & 86987863ns   \\
+  4x4x1           & 2636085474ns \\
+\end{tabular}
+
+\subsection{Channel 3D}
+
+\begin{tabular}{c r}
+  Parallel Domain & Time                 \\
+  Sequential      & 1440966212ns         \\
+  1x1x1           & 1762966207ns         \\
+  2x2x2           & \textbf{574001100ns} \\
+  3x3x3           & 5066212560ns         \\
+\end{tabular}
+
+It looks like the time increases instead of decreasing in most cases: it may be that on a small scale the parallelization overhead is bigger than the possible improvement. It is also worth noting that for both 3D cases the 2x2x2 parallel domain obtains the best results by far, so probably also the divisibility of the simulation domain into the parallel domains plays a non-negligible role.
+
+For this reason, we consider a wider domain, for example 50x60 in the 2D Channel scenario
+
+\begin{tabular}{c r}
+  Parallel Domain & Time                  \\
+  Sequential      & 4058563854ns          \\
+  1x1x1           & 4852222103ns          \\
+  2x1x1           & \textbf{3428565005ns} \\
+  1x2x1           & 4996924073ns          \\
+  2x2x1           & \textbf{3112960876ns} \\
+  4x2x1           & \textbf{2312658368ns} \\
+  2x4x1           & \textbf{3182985333ns} \\
+  4x4x1           & 35063634635ns         \\
+\end{tabular}
+
+It is quite clear here, especially considering the behaviour of the 4x4x1 domain, that there is a point after which the parallelization becomes way slower than the sequential version. If we take a much bigger domain (100x200) and a short time (0.01):
+
+
+\begin{tabular}{c r}
+  Parallel Domain & Time         \\
+  Sequential      & 750595797ns  \\
+  1x1x1           & 859073348ns  \\
+  2x2x1           & 1955024379ns \\
+  3x3x1           & 1205773137ns \\
+  4x4x1           & 8021217360ns \\
+\end{tabular}
+
+If we consider the 3D Channel with a 100x50x100 spatial domain and 4x3x4 parallel domain we get 32397910983ns against 107381417991ns of sequential time, that is, 3.3 times faster. This is clearly still not a strong scaling, because we are using 48 processors.
+\\
+
+So far, we only considered \textit{strong scaling}. In the case of \textit{weak scaling} instead, we use the test case that we still haven't considered, that is \texttt{ChannelBackwardFacingStep}.
+\\
+
+2D:
+
+\begin{tabular}{c r}
+  Sequential  & 445603490ns   \\
+  4 processes & 6599985417ns  \\
+  9 processes & 18636742914ns \\
+\end{tabular}
+\\
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\section{Implementation Turbulence Modeling (30\%)}
+
+\section{Testing (5\%)}
+
+\section{Flow Physics (15\%)}
+
+\newpage
+
+\section*{Appendix}\label{appendix}
+
+\subsection*{Scaling test configurations}
+
+\subsubsection*{Cavity2D}
+
+\begin{verbatim}
+  <?xml version="1.0" encoding="utf-8"?>
+<configuration>
+    <flow Re="500" />
+    <simulation finalTime="0.5" >
+        <type>dns</type>
+        <scenario>cavity</scenario>
+    </simulation>
+    <timestep dt="1" tau="0.5" />
+    <solver gamma="0.5" />
+    <geometry dim="2"
+      lengthX="1.0" lengthY="1.0" lengthZ="1.0"
+      sizeX="20" sizeY="10" sizeZ="20"
+    >
+      <mesh>uniform</mesh>
+    </geometry>
+    <environment gx="0" gy="0" gz="0" />
+    <walls>
+        <left>
+            <vector x="0" y="0" z="0" />
+        </left>
+        <right>
+            <vector x="0" y="0" z="0" />
+        </right>
+        <top>
+            <vector x="1" y="0" z="0" />
+        </top>
+        <bottom>
+            <vector x="0" y="0" z="0" />
+        </bottom>
+        <front>
+            <vector x="0" y="0" z="0" />
+        </front>
+        <back>
+            <vector x="0" y="0" z="0" />
+        </back>
+    </walls>
+    <vtk interval="0.01">Cavity2D</vtk>
+    <stdOut interval="0.01" />
+    <parallel numProcessorsX="1" numProcessorsY="1" numProcessorsZ="1" />
+</configuration>
+\end{verbatim}
+
+\subsubsection*{Cavity3D}
+
+\begin{verbatim}
+  <?xml version="1.0" encoding="utf-8"?>
+<configuration>
+    <flow Re="500" />
+    <simulation finalTime="0.5" >
+        <type>dns</type>
+        <scenario>cavity</scenario>
+    </simulation>
+    <timestep dt="1" tau="0.5" />
+    <solver gamma="0.5" />
+    <geometry dim="3"
+      lengthX="1.0" lengthY="1.0" lengthZ="1.0"
+      sizeX="20" sizeY="10" sizeZ="20"
+    >
+      <mesh>uniform</mesh>
+    </geometry>
+    <environment gx="0" gy="0" gz="0" />
+    <walls>
+        <left>
+            <vector x="0" y="0" z="0" />
+        </left>
+        <right>
+            <vector x="0" y="0" z="0" />
+        </right>
+        <top>
+            <vector x="1" y="0" z="0" />
+        </top>
+        <bottom>
+            <vector x="0" y="0" z="0" />
+        </bottom>
+        <front>
+            <vector x="0" y="0" z="0" />
+        </front>
+        <back>
+            <vector x="0" y="0" z="0" />
+        </back>
+    </walls>
+    <vtk interval="0.01">Cavity3D</vtk>
+    <stdOut interval="0.01" />
+    <parallel numProcessorsX="1" numProcessorsY="1" numProcessorsZ="1" />
+</configuration>
+
+\end{verbatim}
+
+\subsubsection*{Channel2D}
+
+\begin{verbatim}
+  <?xml version="1.0" encoding="utf-8"?>
+<configuration>
+    <flow Re="100" />
+    <simulation finalTime="10.0" >
+        <type>dns</type>
+        <scenario>channel</scenario>
+    </simulation>
+    <timestep dt="1" tau="0.5" />
+    <solver gamma="0.5" />
+    <geometry
+      dim="2"
+      lengthX="5.0" lengthY="1.0" lengthZ="1.0"
+      sizeX="10" sizeY="20" sizeZ="10"
+      stretchX="false" stretchY="true" stretchZ="true"
+    >
+      <mesh>uniform</mesh>
+      <!--mesh>stretched</mesh-->
+    </geometry>
+    <environment gx="0" gy="0" gz="0" />
+    <walls>
+        <left>
+            <vector x="1.0" y="0" z="0" />
+        </left>
+        <right>
+            <vector x="0" y="0" z="0" />
+        </right>
+        <top>
+            <vector x="0.0" y="0." z="0." />
+        </top>
+        <bottom>
+            <vector x="0" y="0" z="0" />
+        </bottom>
+        <front>
+            <vector x="0" y="0" z="0" />
+        </front>
+        <back>
+            <vector x="0" y="0" z="0" />
+        </back>
+    </walls>
+    <vtk interval="0.1">Channel2D</vtk>
+    <stdOut interval="0.0001" />
+    <parallel numProcessorsX="1" numProcessorsY="1" numProcessorsZ="1" />
+</configuration>
+
+\end{verbatim}
+
+\subsubsection*{Channel3D}
+
+\begin{verbatim}
+  <?xml version="1.0" encoding="utf-8"?>
+<configuration>
+    <flow Re="100" />
+    <simulation finalTime="10.0" >
+        <type>dns</type>
+        <scenario>channel</scenario>
+    </simulation>
+    <timestep dt="1" tau="0.5" />
+    <solver gamma="0.5" />
+    <geometry
+      dim="3"
+      lengthX="5.0" lengthY="1.0" lengthZ="1.0"
+      sizeX="10" sizeY="20" sizeZ="10"
+      stretchX="false" stretchY="true" stretchZ="true"
+    >
+      <mesh>uniform</mesh>
+      <!--mesh>stretched</mesh-->
+    </geometry>
+    <environment gx="0" gy="0" gz="0" />
+    <walls>
+        <left>
+            <vector x="1.0" y="0" z="0" />
+        </left>
+        <right>
+            <vector x="0" y="0" z="0" />
+        </right>
+        <top>
+            <vector x="0.0" y="0." z="0." />
+        </top>
+        <bottom>
+            <vector x="0" y="0" z="0" />
+        </bottom>
+        <front>
+            <vector x="0" y="0" z="0" />
+        </front>
+        <back>
+            <vector x="0" y="0" z="0" />
+        </back>
+    </walls>
+    <vtk interval="0.1">Channel3D</vtk>
+    <stdOut interval="0.0001" />
+    <parallel numProcessorsX="1" numProcessorsY="1" numProcessorsZ="1" />
+</configuration>
+
+\end{verbatim}
+
+\subsubsection*{ChannelBackwardFacingStep2D}
+
+\begin{verbatim}
+  <?xml version="1.0" encoding="utf-8"?>
+<configuration>
+    <flow Re="100" />
+    <simulation finalTime="10.0" >
+        <type>dns</type>
+        <scenario>channel</scenario>
+    </simulation>
+    <backwardFacingStep xRatio="0.2" yRatio="0.2" />
+    <timestep dt="1" tau="0.5" />
+    <solver gamma="0.5" />
+    <geometry
+      dim="2"
+      lengthX="5.0" lengthY="1.0" lengthZ="1.0"
+      sizeX="20" sizeY="40" sizeZ="20"
+      stretchX="false" stretchY="true" stretchZ="true"
+    >
+      <mesh>uniform</mesh>
+      <!--mesh>stretched</mesh-->
+    </geometry>
+    <environment gx="0" gy="0" gz="0" />
+    <walls>
+        <left>
+            <vector x="1.0" y="0" z="0" />
+        </left>
+        <right>
+            <vector x="0" y="0" z="0" />
+        </right>
+        <top>
+            <vector x="0.0" y="0." z="0." />
+        </top>
+        <bottom>
+            <vector x="0" y="0" z="0" />
+        </bottom>
+        <front>
+            <vector x="0" y="0" z="0" />
+        </front>
+        <back>
+            <vector x="0" y="0" z="0" />
+        </back>
+    </walls>
+    <vtk interval="0.1">ChannelBackwardFacingStep2D</vtk>
+    <stdOut interval="0.0001" />
+    <parallel numProcessorsX="1" numProcessorsY="1" numProcessorsZ="1" />
+</configuration>
+
+\end{verbatim}
+
+\subsubsection*{ChannelBackwardFacingStep3D}
+
+\begin{verbatim}
+  <?xml version="1.0" encoding="utf-8"?>
+<configuration>
+    <flow Re="100" />
+    <simulation finalTime="10.0" >
+        <type>dns</type>
+        <scenario>channel</scenario>
+    </simulation>
+    <backwardFacingStep xRatio="0.2" yRatio="0.2" />
+    <timestep dt="1" tau="0.5" />
+    <solver gamma="0.5" />
+    <geometry
+      dim="3"
+      lengthX="5.0" lengthY="1.0" lengthZ="1.0"
+      sizeX="20" sizeY="40" sizeZ="20"
+      stretchX="false" stretchY="true" stretchZ="true"
+    >
+      <mesh>uniform</mesh>
+      <!--mesh>stretched</mesh-->
+    </geometry>
+    <environment gx="0" gy="0" gz="0" />
+    <walls>
+        <left>
+            <vector x="1.0" y="0" z="0" />
+        </left>
+        <right>
+            <vector x="0" y="0" z="0" />
+        </right>
+        <top>
+            <vector x="0.0" y="0." z="0." />
+        </top>
+        <bottom>
+            <vector x="0" y="0" z="0" />
+        </bottom>
+        <front>
+            <vector x="0" y="0" z="0" />
+        </front>
+        <back>
+            <vector x="0" y="0" z="0" />
+        </back>
+    </walls>
+    <vtk interval="0.1">ChannelBackwardFacingStep3D</vtk>
+    <stdOut interval="0.0001" />
+    <parallel numProcessorsX="1" numProcessorsY="1" numProcessorsZ="1" />
+</configuration>
+
+\end{verbatim}
+
+\end{document}

@@ -265,6 +265,15 @@ void Configuration::loadParameters(Parameters& parameters, const MPI_Comm& commu
       throw std::runtime_error("Missing type in simulation parameters");
     }
 
+    if (parameters.simulation.type == "turbulence"){
+      subNode = node->FirstChildElement("turbModel");
+      if (subNode != NULL) {
+        readStringMandatory(parameters.simulation.turbModel, subNode);
+      } else {
+        throw std::runtime_error("Missing turbulence model in simulation parameters");
+      }
+    }
+
     subNode = node->FirstChildElement("scenario");
     if (subNode != NULL) {
       readStringMandatory(parameters.simulation.scenario, subNode);
@@ -396,6 +405,48 @@ void Configuration::loadParameters(Parameters& parameters, const MPI_Comm& commu
     //------------------------------------------------------
     // TODO WS2: Turbulence
     //------------------------------------------------------
+    if (parameters.simulation.turbModel == "turbMixing") {
+      parameters.turbMix.k      = -1.0;
+      parameters.turbMix.delta  = -1;
+      node                 = confFile.FirstChildElement()->FirstChildElement("turbMixing");
+      if (node != NULL) {
+        readFloatMandatory(parameters.turbMix.k, node, "k");
+        readIntMandatory(parameters.turbMix.delta, node, "delta");
+        // maybe assumptions on del_0.99
+      }
+      else {
+        throw std::runtime_error("Error loading parameters for turbMixing");
+      }
+    }
+
+    if (parameters.simulation.turbModel == "turbSA") {
+      parameters.turbSA.cb1  = -1.0;
+      parameters.turbSA.cb2  = -1.0;
+      parameters.turbSA.cb3  = -1.0;
+      parameters.turbSA.cv1  = -1.0;
+      parameters.turbSA.cw1  = -1.0;
+      parameters.turbSA.cw2  = -1.0;
+      parameters.turbSA.cw3  = -1.0;
+      parameters.turbSA.ct3  = -1.0;
+      parameters.turbSA.ct4  = -1.0;
+      parameters.turbSA.k    = -1.0;
+      node                    = confFile.FirstChildElement()->FirstChildElement("turbSA");
+      if (node != NULL) {
+        readFloatMandatory(parameters.turbSA.cb1, node, "cb1");
+        readFloatMandatory(parameters.turbSA.cb2, node, "cb2");
+        readFloatMandatory(parameters.turbSA.cb3, node, "cb3");
+        readFloatMandatory(parameters.turbSA.cv1, node, "cv1");
+        readFloatMandatory(parameters.turbSA.cw1, node, "cw1");
+        readFloatMandatory(parameters.turbSA.cw2, node, "cw2");
+        readFloatMandatory(parameters.turbSA.cw3, node, "cw3");
+        readFloatMandatory(parameters.turbSA.ct3, node, "ct3");
+        readFloatMandatory(parameters.turbSA.ct4, node, "ct4");
+        readFloatMandatory(parameters.turbSA.k, node, "k");
+      }
+      else {
+        throw std::runtime_error("Error loading parameters for turbSA");
+      }
+    }
   }
 
   // Broadcasting of the values
@@ -432,10 +483,25 @@ void Configuration::loadParameters(Parameters& parameters, const MPI_Comm& commu
 
   broadcastString(parameters.vtk.prefix, communicator);
   broadcastString(parameters.simulation.type, communicator);
+  broadcastString(parameters.simulation.turbModel, communicator);
   broadcastString(parameters.simulation.scenario, communicator);
 
   MPI_Bcast(&(parameters.bfStep.xRatio), 1, MY_MPI_FLOAT, 0, communicator);
   MPI_Bcast(&(parameters.bfStep.yRatio), 1, MY_MPI_FLOAT, 0, communicator);
+  
+  MPI_Bcast(&(parameters.turbMix.k), 1, MY_MPI_FLOAT, 0, communicator);
+  MPI_Bcast(&(parameters.turbMix.delta), 1, MPI_INT, 0, communicator);
+
+  MPI_Bcast(&(parameters.turbSA.cb1), 1, MY_MPI_FLOAT, 0, communicator);
+  MPI_Bcast(&(parameters.turbSA.cb2), 1, MY_MPI_FLOAT, 0, communicator);
+  MPI_Bcast(&(parameters.turbSA.cb3), 1, MY_MPI_FLOAT, 0, communicator);
+  MPI_Bcast(&(parameters.turbSA.cv1), 1, MY_MPI_FLOAT, 0, communicator);
+  MPI_Bcast(&(parameters.turbSA.cw1), 1, MY_MPI_FLOAT, 0, communicator);
+  MPI_Bcast(&(parameters.turbSA.cw2), 1, MY_MPI_FLOAT, 0, communicator);
+  MPI_Bcast(&(parameters.turbSA.cw3), 1, MY_MPI_FLOAT, 0, communicator);
+  MPI_Bcast(&(parameters.turbSA.ct3), 1, MY_MPI_FLOAT, 0, communicator);
+  MPI_Bcast(&(parameters.turbSA.ct4), 1, MY_MPI_FLOAT, 0, communicator);
+  MPI_Bcast(&(parameters.turbSA.k), 1, MY_MPI_FLOAT, 0, communicator);
 
   MPI_Bcast(parameters.parallel.numProcessors, 3, MPI_INT, 0, communicator);
 

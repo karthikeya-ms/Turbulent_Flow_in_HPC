@@ -61,7 +61,9 @@ void Stencils::BFStepInitStencil::apply(FlowField& flowField, int i, int j, int 
   if (posX + 0.5 * dx < xLimit_ && posY - 0.5 * lastDy < yLimit_) {
     flags.getValue(i, j, k) += OBSTACLE_BOTTOM;
   }
-  if (posX + 0.5 * dx < xLimit_ && posY + dx + 0.5 * nextDy < yLimit_) {
+  if (posX + 0.5 * dx < xLimit_ && posY + dy + 0.5 * nextDy < yLimit_) {
+    // logic error found in existing code 
+    // given condition posY + dx + 0.5 * nextDy
     flags.getValue(i, j, k) += OBSTACLE_TOP;
   }
 }

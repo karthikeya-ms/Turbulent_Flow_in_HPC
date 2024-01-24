@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<configuration>
+    <flow Re="50160" />
+    <simulation finalTime="35.0" >
+        <type>turbulence</type>
+        <turbModel>turbSA</turbModel>
+        <scenario>channel</scenario>
+    </simulation>
+    <turbMixing k="0.41" delta="2"/>
+    <turbSA cb1="0.1355" cb2="0.6220" cb3="0.6667" 
+        cv1="7.1" cw1="3.2391" cw2="0.3" cw3="2.0" 
+        ct3="1.2" ct4="0.5" k="0.41"/>
+    <backwardFacingStep xRatio="0.16666666666" yRatio="0.5" />
+    <timestep dt="1" tau="0.5" />
+    <solver gamma="0.5" />
+    <geometry
+      dim="2"
+      lengthX="1.2" lengthY="0.2" lengthZ="1.0"
+      sizeX="100" sizeY="60" sizeZ="10"
+      stretchX="false" stretchY="false" stretchZ="false"
+    >
+      <mesh>uniform</mesh>
+      <!--mesh>stretched</mesh-->
+    </geometry>
+    <environment gx="0" gy="0" gz="0" />
+    <walls>
+        <left>
+            <vector x="1.0" y="0" z="0" />
+        </left>
+        <right>
+            <vector x="0" y="0" z="0" />
+        </right>
+        <top>
+            <vector x="0.0" y="0." z="0." />
+        </top>
+        <bottom>
+            <vector x="0" y="0" z="0" />
+        </bottom>
+        <front>
+            <vector x="0" y="0" z="0" />
+        </front>
+        <back>
+            <vector x="0" y="0" z="0" />
+        </back>
+    </walls>
+    <vtk interval="0.1">ChannelBackwardFacingStep2D_10000_2</vtk>
+    <stdOut interval="0.0001" />
+    <parallel numProcessorsX="1" numProcessorsY="1" numProcessorsZ="1" />
+</configuration>
