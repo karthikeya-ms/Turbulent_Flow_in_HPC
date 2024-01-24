@@ -18,8 +18,6 @@
 #include "Stencils/PeriodicBoundaryStencils.hpp"
 #include "Stencils/VelocityStencil.hpp"
 #include "Stencils/VTKStencil.hpp"
-#include "./ParallelManagers/PetscParallelManager.hpp"
-
 
 class Simulation {
 protected:
@@ -37,8 +35,8 @@ protected:
   GlobalBoundaryIterator<FlowField> wallFGHIterator_;
   
   Stencils::FGHStencil     fghStencil_;
+  Stencils::RHSStencil rhsStencil_;
   FieldIterator<FlowField> fghIterator_;
-  Stencils::RHSStencil     rhsStencil_;
   FieldIterator<FlowField> rhsIterator_;
 
   Stencils::VelocityStencil velocityStencil_;
@@ -47,8 +45,6 @@ protected:
   FieldIterator<FlowField>  obstacleIterator_;
 
   std::unique_ptr<Solvers::LinearSolver> solver_;
-
-  ParallelManagers::PetscParallelManager parallel_manager_;
 
   virtual void setTimeStep();
 
