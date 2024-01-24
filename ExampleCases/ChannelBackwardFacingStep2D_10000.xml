@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <configuration>
-    <flow Re="10000" />
-    <simulation finalTime="10.0" >
+    <flow Re="50160" />
+    <simulation finalTime="35.0" >
         <type>turbulence</type>
         <turbModel>turbSA</turbModel>
         <scenario>channel</scenario>
@@ -10,13 +10,13 @@
     <turbSA cb1="0.1355" cb2="0.6220" cb3="0.6667" 
         cv1="7.1" cw1="3.2391" cw2="0.3" cw3="2.0" 
         ct3="1.2" ct4="0.5" k="0.41"/>
-    <backwardFacingStep xRatio="0.2" yRatio="0.2" />
+    <backwardFacingStep xRatio="0.16666666666" yRatio="0.5" />
     <timestep dt="1" tau="0.5" />
     <solver gamma="0.5" />
     <geometry
       dim="2"
-      lengthX="5.0" lengthY="1.0" lengthZ="1.0"
-      sizeX="80" sizeY="40" sizeZ="10"
+      lengthX="1.2" lengthY="0.2" lengthZ="1.0"
+      sizeX="100" sizeY="60" sizeZ="10"
       stretchX="false" stretchY="false" stretchZ="false"
     >
       <mesh>uniform</mesh>

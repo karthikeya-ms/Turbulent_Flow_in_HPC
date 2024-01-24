@@ -11,8 +11,8 @@ void Stencils::VisualizeStencil::apply(TurbulentFlowField& flowField, int i, int
     RealType Visc_ = 1 / parameters_.flow.Re;
     RealType ChVis = flowField.getNewChVis().getScalar(i, j);
 
-    loadLocalVelocity2D(flowField, localVelocity_, i, parameters_.geometry.sizeX);
-    loadLocalMeshsize2D(parameters_, localMeshsize_, i, parameters_.geometry.sizeX);
+    loadLocalVelocity2D(flowField, localVelocity_, i, parameters_.geometry.sizeY);
+    loadLocalMeshsize2D(parameters_, localMeshsize_, i, parameters_.geometry.sizeY);
 
     RealType dudy_wall = dudy(localVelocity_, localMeshsize_);
     RealType tau_wall = std::fabs(dudy_wall) * (Visc_ + ChVis);
@@ -23,14 +23,14 @@ void Stencils::VisualizeStencil::apply(TurbulentFlowField& flowField, int i, int
     RealType tau_net = std::fabs(dudy_net) * (Visc_ + ChVis);
 
     RealType u_tau = std::sqrt(tau_wall);   // wall shear velocity
-    RealType l_plus = Visc_ * u_tau;         // wall_unit
     
     if (dudy_wall == 0) {
         flowField.getYPlus().getScalar(i,j) = 0.0;
         flowField.getUPlus().getScalar(i,j) = 0.0; 
         flowField.getTau().getScalar(i,j)   = 0.0;
-    } else{
-        flowField.getYPlus().getScalar(i,j) = flowField.getWallh().getScalar(i,j) / l_plus;  // y_plus
+    } 
+    else{
+        flowField.getYPlus().getScalar(i,j) = flowField.getWallh().getScalar(i,j) * u_tau / Visc_;  // y_plus
         flowField.getUPlus().getScalar(i,j) = (
             0.5 * (flowField.getVelocity().getVector(i - 1, j)[0] + flowField.getVelocity().getVector(i, j)[0])
             ) / (u_tau);   // u_plus
@@ -47,8 +47,8 @@ void Stencils::VisualizeStencil::apply(TurbulentFlowField& flowField, int i, int
     RealType Visc_ = 1 / parameters_.flow.Re;
     RealType ChVis = flowField.getNewChVis().getScalar(i, j, k);
 
-    loadLocalVelocity3D(flowField, localVelocity_, i, parameters_.geometry.sizeX, k);
-    loadLocalMeshsize3D(parameters_, localMeshsize_, i, parameters_.geometry.sizeX, k);
+    loadLocalVelocity3D(flowField, localVelocity_, i, parameters_.geometry.sizeY, k);
+    loadLocalMeshsize3D(parameters_, localMeshsize_, i, parameters_.geometry.sizeY, k);
     RealType dudy_wall = dudy(localVelocity_, localMeshsize_);
     RealType tau_wall = std::fabs(dudy_wall) * (Visc_ + ChVis);
 
@@ -58,11 +58,18 @@ void Stencils::VisualizeStencil::apply(TurbulentFlowField& flowField, int i, int
     RealType tau_net = std::fabs(dudy_net) * (Visc_ + ChVis);
 
     RealType u_tau = std::sqrt(tau_wall);   // wall shear velocity
-    RealType l_plus = Visc_ * u_tau;         // wall_unit
     
-    flowField.getYPlus().getScalar(i, j, k) = flowField.getWallh().getScalar(i, j) / l_plus;  // y_plus
-    flowField.getUPlus().getScalar(i, j, k) = (
-        0.5 * (flowField.getVelocity().getVector(i - 1, j, k)[0] + flowField.getVelocity().getVector(i, j, k)[0])
-        ) / (u_tau);   // u_plus
-    flowField.getTau().getScalar(i, j, k) = tau_net / tau_wall; // tau_norm
+    if (dudy_wall == 0) {
+        flowField.getYPlus().getScalar(i,j) = 0.0;
+        flowField.getUPlus().getScalar(i,j) = 0.0; 
+        flowField.getTau().getScalar(i,j)   = 0.0;
+    } 
+    else {
+        int k_half = parameters_.geometry.sizeZ/2 - 1;
+        flowField.getYPlus().getScalar(i, j, k) = flowField.getWallh().getScalar(i, j, k_half) * u_tau / Visc_;  // y_plus
+        flowField.getUPlus().getScalar(i, j, k) = (
+            0.5 * (flowField.getVelocity().getVector(i - 1, j, k)[0] + flowField.getVelocity().getVector(i, j, k)[0])
+            ) / (u_tau);   // u_plus
+        flowField.getTau().getScalar(i, j, k) = tau_net / tau_wall; // tau_norm
+    }
 }
