@@ -67,27 +67,42 @@ void TurbulentSimulation::solveTimestep() {
   // Compute velocity
   velocityIterator_.iterate();
   obstacleIterator_.iterate();
-   parallel_manager_.communicateVelocity();
+  parallel_manager_.communicateVelocity();
   // TODO WS2: communicate velocity values
   // Iterate for velocities on the boundary
   wallVelocityIterator_.iterate();
   
-  //Compute source terms in Spalart-Allmaras model
-  // QIterator_.iterate();
-  //Compute Nabla terms in Spalart-Allmaras model
-  // NablaIterator_.iterate();
-  //Compute characteristic viscosity
-  // ChViscosityIterator_.iterate();
+  if (parameters_.simulation.turbModel == "turbSA") {
+    parallel_manager_.communicateChViscosity();
+    //Compute source terms in Spalart-Allmaras model
+    QIterator_.iterate();
+    //Compute Nabla terms in Spalart-Allmaras model
+    NablaIterator_.iterate();
+    //Compute characteristic viscosity
+    ChViscosityIterator_.iterate();
+  }
+
   // Compute local viscosities
   turbViscIterator_.iterate();
-  // Update current ChVisc values
-  turbFlowField_.setOldChVis();
+
+  if (parameters_.simulation.turbModel != "turbSA") {
+    parallel_manager_.communicateChViscosity();
+  }
+
+  if (parameters_.simulation.turbModel == "turbSA") {  
+    // Update current ChVisc values
+    turbFlowField_.updateChVis();
+  }
+
 }
 
 void TurbulentSimulation::plotVTK(int timeStep, RealType simulationTime) {
+  Stencils::VisualizeStencil         visualizeStencil(parameters_);
+  FieldIterator<TurbulentFlowField>  visualizeIterator(turbFlowField_, parameters_, visualizeStencil, 1, 0);
   Stencils::TurbulentVTKStencil     vtkStencil(parameters_);
   FieldIterator<TurbulentFlowField> vtkIterator(turbFlowField_, parameters_, vtkStencil, 1, 0);
-
+  
+  visualizeIterator.iterate();
   vtkIterator.iterate();
   vtkStencil.write(turbFlowField_, timeStep, simulationTime);
 }

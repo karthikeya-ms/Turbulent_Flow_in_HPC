@@ -96,17 +96,26 @@ void Stencils::TurbulentVTKStencil::apply(TurbulentFlowField& flowField, int i, 
   RealType pressure    = 0.0;
   RealType velocity[2] = {0.0, 0.0};
   RealType turbVisc    = 0.0;
+  RealType tau         = 0.0;
+  RealType yPlus       = 0.0;
+  RealType uPlus       = 0.0;
 
   if ((flowField.getFlags().getValue(i, j) & OBSTACLE_SELF) == 0) {
-    flowField.getPressureVelocityTurbVisc(pressure, velocity, turbVisc, i, j);
+    flowField.getFlowFieldData(pressure, velocity, turbVisc, tau, yPlus, uPlus, i, j);
 
     pressureStream_ << pressure << std::endl;
     velocityStream_ << velocity[0] << " " << velocity[1] << " 0" << std::endl;
     turbViscStream_ << turbVisc << std::endl;
+    tauStream_      << tau      << std::endl;
+    yPlusStream_    << yPlus    << std::endl;
+    uPlusStream_    << uPlus    << std::endl;
   } else {
     pressureStream_ << "0.0" << std::endl;
     velocityStream_ << "0.0 0.0 0.0" << std::endl;
     turbViscStream_ << "0.0" << std::endl;
+    tauStream_      << "0.0" << std::endl;
+    yPlusStream_    << "0.0" << std::endl;
+    uPlusStream_    << "0.0" << std::endl;
   }
 }
 
@@ -116,17 +125,27 @@ void Stencils::TurbulentVTKStencil::apply(TurbulentFlowField& flowField, int i, 
   RealType pressure    = 0.0;
   RealType velocity[3] = {0.0, 0.0, 0.0};
   RealType turbVisc    = 0.0;
+  RealType tau         = 0.0;
+  RealType yPlus       = 0.0;
+  RealType uPlus       = 0.0;
 
   if ((flowField.getFlags().getValue(i, j, k) & OBSTACLE_SELF) == 0) {
-    flowField.getPressureVelocityTurbVisc(pressure, velocity, turbVisc, i, j, k);
+    flowField.getFlowFieldData(pressure, velocity, turbVisc, tau, yPlus, uPlus, i, j, k);
 
-    pressureStream_ << pressure << std::endl;
-    velocityStream_ << velocity[0] << " " << velocity[1] << " " << velocity[2] << std::endl;
+    pressureStream_ << pressure     << std::endl;
+    velocityStream_ << velocity[0]  << " " << velocity[1] << " " << velocity[2] << std::endl;
     turbViscStream_ << turbVisc << std::endl;
+    tauStream_      << tau      << std::endl;
+    yPlusStream_    << yPlus    << std::endl;
+    uPlusStream_    << uPlus    << std::endl;
+
   } else {
     pressureStream_ << "0.0" << std::endl;
     velocityStream_ << "0.0 0.0 0.0" << std::endl;
     turbViscStream_ << "0.0" << std::endl;
+    tauStream_      << "0.0" << std::endl;
+    yPlusStream_    << "0.0" << std::endl;
+    uPlusStream_    << "0.0" << std::endl;
   }
 }
 
@@ -165,10 +184,25 @@ void Stencils::TurbulentVTKStencil::write(TurbulentFlowField& flowField, int tim
 
     // Write turbVisc    
     ofile_ 
-      << "SCALARS turbVisc float 1" << std::endl
+      << "SCALARS turbVisc double 1" << std::endl
       << "LOOKUP_TABLE default" << std::endl;
     ofile_ << turbViscStream_.str() << std::endl;
     turbViscStream_.str("");
+
+    // Write shear stress tau
+    ofile_ << "SCALARS shearStress double 1" << std::endl << "LOOKUP_TABLE default" << std::endl;
+    ofile_ << tauStream_.str() << std::endl;
+    tauStream_.str("");
+
+    // Write uPlus
+    ofile_ << "SCALARS uPlus double 1" << std::endl << "LOOKUP_TABLE default" << std::endl;
+    ofile_ << uPlusStream_.str() << std::endl;
+    uPlusStream_.str("");
+
+    // Write yPlus
+    ofile_ << "SCALARS yPlus double 1" << std::endl << "LOOKUP_TABLE default" << std::endl;
+    ofile_ << yPlusStream_.str() << std::endl;
+    yPlusStream_.str("");
   }
 
   if (FieldStencil<TurbulentFlowField>::parameters_.geometry.dim == 3) {
@@ -187,10 +221,25 @@ void Stencils::TurbulentVTKStencil::write(TurbulentFlowField& flowField, int tim
 
     // Write turbVisc    
     ofile_ 
-      << "SCALARS turbVisc float 1" << std::endl
+      << "SCALARS turbVisc double 1" << std::endl
       << "LOOKUP_TABLE default" << std::endl;
     ofile_ << turbViscStream_.str() << std::endl;
     turbViscStream_.str("");
+
+    // Write shear stress tau
+    ofile_ << "SCALARS shearStress double 1" << std::endl << "LOOKUP_TABLE default" << std::endl;
+    ofile_ << tauStream_.str() << std::endl;
+    tauStream_.str("");
+
+    // Write uPlus
+    ofile_ << "SCALARS uPlus double 1" << std::endl << "LOOKUP_TABLE default" << std::endl;
+    ofile_ << uPlusStream_.str() << std::endl;
+    uPlusStream_.str("");
+
+    // Write yPlus
+    ofile_ << "SCALARS yPlus double 1" << std::endl << "LOOKUP_TABLE default" << std::endl;
+    ofile_ << yPlusStream_.str() << std::endl;
+    yPlusStream_.str("");
   }
 
   written_ = true;

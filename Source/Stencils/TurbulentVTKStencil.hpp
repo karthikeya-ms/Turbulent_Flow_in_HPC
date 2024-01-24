@@ -20,6 +20,10 @@ namespace Stencils {
     std::stringstream pressureStream_; //! Stream for the pressure data
     std::stringstream velocityStream_; //! Stream for the velocity data
     std::stringstream turbViscStream_; //! Stream for the velocity data
+    
+    std::stringstream tauStream_; //! Stream for the tau data
+    std::stringstream uPlusStream_; //! Stream for the uPlus data
+    std::stringstream yPlusStream_; //! Stream for the yPlus data
 
     void writeVTKHeader(std::ostream& file) const;
     void writePoints(std::ostream& file, RealType simulationTime) const;

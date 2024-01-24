@@ -16,6 +16,7 @@
 #include "Stencils/ChViscosityStencil.hpp" // Spalart-Allmaras turbulence model stencils
 #include "Stencils/QStencil.hpp"
 #include "Stencils/NablaStencil.hpp"
+#include "Stencils/VisualizeStencil.hpp"
 
 class TurbulentSimulation : public Simulation {
 protected:

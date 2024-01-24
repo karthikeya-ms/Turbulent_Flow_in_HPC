@@ -19,6 +19,11 @@ private:
   ScalarField OldChVis_;//! Characteristic viscosity 
   ScalarField NewChVis_;//! Characteristic viscosity 
 
+  // Terms for visualising validation
+  ScalarField yPlus_;
+  ScalarField uPlus_;
+  ScalarField tau_;
+
 public:
   /** Constructor for the 2D turbulent flow field */
   TurbulentFlowField(int Nx, int Ny);
@@ -37,9 +42,12 @@ public:
   ScalarField& getNabla();
   ScalarField& getOldChVis();
   ScalarField& getNewChVis();
-  void setOldChVis();
+  ScalarField& getYPlus();
+  ScalarField& getUPlus();
+  ScalarField& getTau();
+  void updateChVis();
 
 
-  void getPressureVelocityTurbVisc(RealType& pressure, RealType* const velocity, RealType& turbVisc, int i, int j);
-  void getPressureVelocityTurbVisc(RealType& pressure, RealType* const velocity, RealType& turbVisc, int i, int j, int k);
+  void getFlowFieldData(RealType& pressure, RealType* const velocity, RealType& turbVisc, RealType& tau, RealType& yPlus, RealType& uPlus, int i, int j);
+  void getFlowFieldData(RealType& pressure, RealType* const velocity, RealType& turbVisc, RealType& tau, RealType& yPlus, RealType& uPlus, int i, int j, int k);
 };

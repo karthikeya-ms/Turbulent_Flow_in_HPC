@@ -9,7 +9,10 @@ TurbulentFlowField::TurbulentFlowField(int Nx, int Ny):
   Q_(ScalarField(Nx + 3, Ny + 3)),
   Nabla_(ScalarField(Nx + 3, Ny + 3)),
   OldChVis_(ScalarField(Nx + 3, Ny + 3)),
-  NewChVis_(ScalarField(Nx + 3, Ny + 3)){
+  NewChVis_(ScalarField(Nx + 3, Ny + 3)),
+  yPlus_(ScalarField(Nx + 3, Ny + 3)),
+  uPlus_(ScalarField(Nx + 3, Ny + 3)),
+  tau_(ScalarField(Nx + 3, Ny + 3)) {
 
   ASSERTION(Nx > 0);
   ASSERTION(Ny > 0);
@@ -22,7 +25,10 @@ TurbulentFlowField::TurbulentFlowField(int Nx, int Ny, int Nz):
   Q_(ScalarField(Nx + 3, Ny + 3, Nz + 3)),
   Nabla_(ScalarField(Nx + 3, Ny + 3, Nz + 3)),
   OldChVis_(ScalarField(Nx + 3, Ny + 3, Nz + 3)),
-  NewChVis_(ScalarField(Nx + 3, Ny + 3, Nz + 3)){
+  NewChVis_(ScalarField(Nx + 3, Ny + 3, Nz + 3)),
+  yPlus_(ScalarField(Nx + 3, Ny + 3, Nz + 3)),
+  uPlus_(ScalarField(Nx + 3, Ny + 3, Nz + 3)),
+  tau_(ScalarField(Nx + 3, Ny + 3, Nz + 3)) {
   
   ASSERTION(Nx > 0);
   ASSERTION(Ny > 0);
@@ -60,6 +66,21 @@ TurbulentFlowField::TurbulentFlowField(const Parameters& parameters):
     parameters.geometry.dim == 2 ? 
     ScalarField(parameters.parallel.localSize[0] + 3, parameters.parallel.localSize[1] + 3) : 
     ScalarField(parameters.parallel.localSize[0] + 3, parameters.parallel.localSize[1] + 3, parameters.parallel.localSize[2] + 3)
+  ),
+  yPlus_(
+    parameters.geometry.dim == 2 ? 
+    ScalarField(parameters.parallel.localSize[0] + 3, parameters.parallel.localSize[1] + 3) : 
+    ScalarField(parameters.parallel.localSize[0] + 3, parameters.parallel.localSize[1] + 3, parameters.parallel.localSize[2] + 3)
+  ),
+  uPlus_(
+    parameters.geometry.dim == 2 ? 
+    ScalarField(parameters.parallel.localSize[0] + 3, parameters.parallel.localSize[1] + 3) : 
+    ScalarField(parameters.parallel.localSize[0] + 3, parameters.parallel.localSize[1] + 3, parameters.parallel.localSize[2] + 3)
+  ),
+  tau_(
+    parameters.geometry.dim == 2 ? 
+    ScalarField(parameters.parallel.localSize[0] + 3, parameters.parallel.localSize[1] + 3) : 
+    ScalarField(parameters.parallel.localSize[0] + 3, parameters.parallel.localSize[1] + 3, parameters.parallel.localSize[2] + 3)
   )
   {}
 
@@ -75,12 +96,18 @@ ScalarField& TurbulentFlowField::getOldChVis() { return OldChVis_; }
 
 ScalarField& TurbulentFlowField::getNewChVis() { return NewChVis_; }
 
-void TurbulentFlowField::setOldChVis(){
+ScalarField& TurbulentFlowField::getYPlus() { return yPlus_; }
+
+ScalarField& TurbulentFlowField::getUPlus() { return uPlus_; }
+
+ScalarField& TurbulentFlowField::getTau() { return tau_; }
+
+void TurbulentFlowField::updateChVis(){
   OldChVis_ = NewChVis_;
 }
 
 
-void TurbulentFlowField::getPressureVelocityTurbVisc(RealType& pressure, RealType* const velocity, RealType& turbVisc, int i, int j) {
+void TurbulentFlowField::getFlowFieldData(RealType& pressure, RealType* const velocity, RealType& turbVisc, RealType& tau, RealType& yPlus, RealType& uPlus, int i, int j) {
   RealType* vHere = getVelocity().getVector(i, j);
   RealType* vLeft = getVelocity().getVector(i - 1, j);
   RealType* vDown = getVelocity().getVector(i, j - 1);
@@ -88,12 +115,14 @@ void TurbulentFlowField::getPressureVelocityTurbVisc(RealType& pressure, RealTyp
   velocity[0] = (vHere[0] + vLeft[0]) / 2;
   velocity[1] = (vHere[1] + vDown[1]) / 2;
 
-  pressure = getPressure().getScalar(i, j);
-  
-  turbVisc = getTurbVisc().getScalar(i, j);
+  pressure  = getPressure().getScalar(i, j);
+  turbVisc  = getTurbVisc().getScalar(i, j);
+  tau       = getTau().getScalar(i, j);
+  yPlus     = getYPlus().getScalar(i, j);
+  uPlus     = getUPlus().getScalar(i, j);
 }
 
-void TurbulentFlowField::getPressureVelocityTurbVisc(RealType& pressure, RealType* const velocity, RealType& turbVisc, int i, int j, int k) {
+void TurbulentFlowField::getFlowFieldData(RealType& pressure, RealType* const velocity, RealType& turbVisc, RealType& tau, RealType& yPlus, RealType& uPlus, int i, int j, int k) {
   RealType* vHere = getVelocity().getVector(i, j, k);
   RealType* vLeft = getVelocity().getVector(i - 1, j, k);
   RealType* vDown = getVelocity().getVector(i, j - 1, k);
@@ -104,6 +133,8 @@ void TurbulentFlowField::getPressureVelocityTurbVisc(RealType& pressure, RealTyp
   velocity[2] = (vHere[2] + vBack[2]) / 2;
 
   pressure = getPressure().getScalar(i, j, k);
-
   turbVisc = getTurbVisc().getScalar(i, j, k);
+  tau       = getTau().getScalar(i, j, k);
+  yPlus     = getYPlus().getScalar(i, j, k);
+  uPlus     = getUPlus().getScalar(i, j, k);
 }

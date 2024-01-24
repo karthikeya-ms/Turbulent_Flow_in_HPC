@@ -28,7 +28,11 @@ ParallelManagers::PetscParallelManager::PetscParallelManager(Parameters& paramet
   fillViscosityStencil(parameters),
   readViscosityStencil(parameters),
   viscosityfillIterator(flowfield, parameters, fillViscosityStencil, 0, 0),
-  viscosityreadIterator(flowfield, parameters, readViscosityStencil, 0, 0) {}
+  viscosityreadIterator(flowfield, parameters, readViscosityStencil, 0, 0),
+  fillChViscosityStencil(parameters),
+  readChViscosityStencil(parameters),
+  ChviscosityfillIterator(flowfield, parameters, fillChViscosityStencil, 0, 0),
+  ChviscosityreadIterator(flowfield, parameters, readChViscosityStencil, 0, 0) {}
 
 void ParallelManagers::PetscParallelManager::communicatePressure() {
 
@@ -694,3 +698,244 @@ void ParallelManagers::PetscTurbulentParallelManager::communicateViscosity() {
   }
   viscosityreadIterator.iterate();
 }
+
+
+
+void ParallelManagers::PetscTurbulentParallelManager::communicateChViscosity() {
+  ChviscosityfillIterator.iterate();
+//****************************************
+// For 3D 
+//***************************************
+  if (parameters_.geometry.dim == 3) {
+    // for Ch visc
+    MPI_Request Ch_request[12];
+    MPI_Status  Ch_status[12];
+
+    const int*  localSize = fillChViscosityStencil.localSize; // localSize same for Ch visc
+
+    //left to right Ch visc (IF CONDITION REQ FOR SA)
+    MPI_Isend(
+      fillChViscosityStencil.leftChViscosityFillBuffer.get(),
+      localSize[1] * localSize[2],
+      MY_MPI_FLOAT,
+      parameters_.parallel.leftNb,
+      901,
+      PETSC_COMM_WORLD,
+      &Ch_request[0]
+    );
+    MPI_Irecv(
+      readChViscosityStencil.rightChViscosityReadBuffer.get(),
+      localSize[1] * localSize[2],
+      MY_MPI_FLOAT,
+      parameters_.parallel.rightNb,
+      901,
+      PETSC_COMM_WORLD,
+      &Ch_request[1]
+    );
+
+    // right to left Ch visc
+    MPI_Isend(
+      fillChViscosityStencil.rightChViscosityFillBuffer.get(),
+      localSize[1] * localSize[2],
+      MY_MPI_FLOAT,
+      parameters_.parallel.rightNb,
+      902,
+      PETSC_COMM_WORLD,
+      &Ch_request[2]
+    );
+    MPI_Irecv(
+      readChViscosityStencil.leftChViscosityReadBuffer.get(),
+      localSize[1] * localSize[2],
+      MY_MPI_FLOAT,
+      parameters_.parallel.leftNb,
+      902,
+      PETSC_COMM_WORLD,
+      &Ch_request[3]
+    );
+
+    //top to bottom Ch visc
+    MPI_Isend(
+      fillChViscosityStencil.topChViscosityFillBuffer.get(),
+      localSize[0] * localSize[2],
+      MY_MPI_FLOAT,
+      parameters_.parallel.topNb,
+      903,
+      PETSC_COMM_WORLD,
+      &Ch_request[4]
+    );
+    MPI_Irecv(
+      readChViscosityStencil.bottomChViscosityReadBuffer.get(),
+      localSize[0] * localSize[2],
+      MY_MPI_FLOAT,
+      parameters_.parallel.bottomNb,
+      903,
+      PETSC_COMM_WORLD,
+      &Ch_request[5]
+    );
+
+    // bottom to top Ch visc
+    MPI_Isend(
+      fillChViscosityStencil.bottomChViscosityFillBuffer.get(),
+      localSize[0] * localSize[2],
+      MY_MPI_FLOAT,
+      parameters_.parallel.bottomNb,
+      904,
+      PETSC_COMM_WORLD,
+      &Ch_request[6]
+    );
+    MPI_Irecv(
+      readChViscosityStencil.topChViscosityReadBuffer.get(),
+      localSize[0] * localSize[2],
+      MY_MPI_FLOAT,
+      parameters_.parallel.topNb,
+      904,
+      PETSC_COMM_WORLD,
+      &Ch_request[7]
+    );
+
+    // front to back Ch visc
+    MPI_Isend(
+      fillChViscosityStencil.frontChViscosityFillBuffer.get(),
+      localSize[0] * localSize[1],
+      MY_MPI_FLOAT,
+      parameters_.parallel.frontNb,
+      905,
+      PETSC_COMM_WORLD,
+      &Ch_request[8]
+    );
+    MPI_Irecv(
+      readChViscosityStencil.backChViscosityReadBuffer.get(),
+      localSize[0] * localSize[1],
+      MY_MPI_FLOAT,
+      parameters_.parallel.backNb,
+      905,
+      PETSC_COMM_WORLD,
+      &Ch_request[9]
+    );
+
+    // back to front Ch visc
+    MPI_Isend(
+      fillChViscosityStencil.backChViscosityFillBuffer.get(),
+      localSize[0] * localSize[1],
+      MY_MPI_FLOAT,
+      parameters_.parallel.backNb,
+      906,
+      PETSC_COMM_WORLD,
+      &Ch_request[10]
+    );
+    MPI_Irecv(
+      readChViscosityStencil.frontChViscosityReadBuffer.get(),
+      localSize[0] * localSize[1],
+      MY_MPI_FLOAT,
+      parameters_.parallel.frontNb,
+      906,
+      PETSC_COMM_WORLD,
+      &Ch_request[11]
+    );
+
+    for (size_t i = 0; i < 12; i++) {
+      MPI_Wait(&Ch_request[i], &Ch_status[i]);
+
+    }
+  }
+  //********************************************************
+  //for 2D
+  //********************************************************
+  if (parameters_.geometry.dim == 2) {
+    
+    // for Ch visc
+    MPI_Request Ch_request[8];
+    MPI_Status  Ch_status[8];
+
+    const int* localSize = fillChViscosityStencil.localSize;
+
+    // left to right Ch visc
+    MPI_Isend(
+      fillChViscosityStencil.leftChViscosityFillBuffer.get(),
+      localSize[1],
+      MY_MPI_FLOAT,
+      parameters_.parallel.leftNb,
+      901,
+      PETSC_COMM_WORLD,
+      &Ch_request[0]
+    );
+    MPI_Irecv(
+      readChViscosityStencil.rightChViscosityReadBuffer.get(),
+      localSize[1],
+      MY_MPI_FLOAT,
+      parameters_.parallel.rightNb,
+      901,
+      PETSC_COMM_WORLD,
+      &Ch_request[1]
+    );
+
+    // right to left Ch visc
+    MPI_Isend(
+      fillChViscosityStencil.rightChViscosityFillBuffer.get(),
+      localSize[1],
+      MY_MPI_FLOAT,
+      parameters_.parallel.rightNb,
+      902,
+      PETSC_COMM_WORLD,
+      &Ch_request[2]
+    );
+    MPI_Irecv(
+      readChViscosityStencil.leftChViscosityReadBuffer.get(),
+      localSize[1],
+      MY_MPI_FLOAT,
+      parameters_.parallel.leftNb,
+      902,
+      PETSC_COMM_WORLD,
+      &Ch_request[3]
+    );
+
+    //top to bottom Ch viscs
+    MPI_Isend(
+      fillChViscosityStencil.topChViscosityFillBuffer.get(),
+      localSize[0],
+      MY_MPI_FLOAT,
+      parameters_.parallel.topNb,
+      903,
+      PETSC_COMM_WORLD,
+      &Ch_request[4]
+    );
+    MPI_Irecv(
+      readChViscosityStencil.bottomChViscosityReadBuffer.get(),
+      localSize[0],
+      MY_MPI_FLOAT,
+      parameters_.parallel.bottomNb,
+      903,
+      PETSC_COMM_WORLD,
+      &Ch_request[5]
+    );
+
+    // bottom to top Ch Visc
+        MPI_Isend(
+      fillChViscosityStencil.bottomChViscosityFillBuffer.get(),
+      localSize[0],
+      MY_MPI_FLOAT,
+      parameters_.parallel.bottomNb,
+      904,
+      PETSC_COMM_WORLD,
+      &Ch_request[6]
+    );
+    MPI_Irecv(
+      readChViscosityStencil.topChViscosityReadBuffer.get(),
+      localSize[0],
+      MY_MPI_FLOAT,
+      parameters_.parallel.topNb,
+      904,
+      PETSC_COMM_WORLD,
+      &Ch_request[7]
+    );
+    for (size_t i = 0; i < 8; i++) {
+      MPI_Wait(&Ch_request[i], &Ch_status[i]);
+
+    }
+  }
+    ChviscosityreadIterator.iterate();
+
+
+
+}
+
