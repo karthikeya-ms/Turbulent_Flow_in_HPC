@@ -42,7 +42,7 @@ TanhMeshStretching::TanhMeshStretching(const Parameters& parameters, bool stretc
   stretchY_(stretchY),
   stretchZ_(stretchZ),
   deltaS_(2.7),
-  tanhDeltaS_(tanh(2.7)) // This parameters is chosen as 2.7 as used also in the dissertation by Tobias Neckel
+  tanhDeltaS_(tanh(2.87078)) // This parameters is chosen as 2.7 as used also in the dissertation by Tobias Neckel
   ,
   dxMin_(
     stretchX
