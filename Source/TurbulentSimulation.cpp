@@ -86,7 +86,7 @@ void TurbulentSimulation::solveTimestep() {
   turbViscIterator_.iterate();
 
   if (parameters_.simulation.turbModel != "turbSA") {
-    parallel_manager_.communicateChViscosity();
+    parallel_manager_.communicateViscosity();
   }
 
   if (parameters_.simulation.turbModel == "turbSA") {  
